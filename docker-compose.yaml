@@ -13,6 +13,20 @@ services:
       - viethistory-network
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    # Create container for test
+  test-database:
+    image: postgres:15.0
+    container_name: test-database
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: umap12345
+      POSTGRES_DB: viethistory-test
+    networks:
+      - viethistory-network
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
 networks:
   viethistory-network:
 volumes:

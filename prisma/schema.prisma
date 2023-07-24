@@ -18,65 +18,105 @@ enum Role {
   subscriber
 }
 
-enum Status {
+enum UserStatus {
   active
   inactive
   blocked
   deleted
 }
 
+enum Status {
+  private
+  draft
+  public
+  deleted
+}
+
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
+  id           Int        @id @default(autoincrement())
+  email        String     @unique
   password     String
   phone_number String?
-  status       Status   @default(active)
-  role         Role     @default(subscriber)
+  status       UserStatus @default(active)
+  role         Role       @default(subscriber)
   first_name   String?
   last_name    String?
   avatar       String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  posts        Post[]
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+
+  Posts Post[]
+  Media Media[]
 
   @@map("vh_users")
 }
 
 model Post {
-  id               Int      @id @default(autoincrement())
+  id               Int        @id @default(autoincrement())
   title            String
   description      String
-  status           String
-  thumb            String
-  images           String[]
+  status           Status
+  thumb            Int?
+  images           String?
   content          String
   timestamp        DateTime
-  order            String
-  meta_title       String
-  meta_description String
-  meta_keywords    String
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  order            Int?
+  meta_title       String?
+  meta_description String?
+  meta_keywords    String?
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
   user_id          Int
-  user             User     @relation(fields: [user_id], references: [id])
+
+  User         User           @relation(fields: [user_id], references: [id])
+  PostCategory PostCategory[]
 
   @@map("vh_posts")
 }
 
 model Category {
   id               Int      @id @default(autoincrement())
-  parent_id        Int
+  parent_id        Int?
   name             String
-  description      String
+  description      String?
   status           String
-  thumb            String
-  images           String[]
-  order            String
-  meta_title       String
-  meta_description String
-  meta_keywords    String
+  thumb            Int?
+  images           String?
+  order            Int?
+  meta_title       String?
+  meta_description String?
+  meta_keywords    String?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 
+  PostCategory PostCategory[]
+
   @@map("vh_categories")
+}
+
+model PostCategory {
+  id          Int @id @default(autoincrement())
+  post_id     Int
+  category_id Int
+
+  Post     Post     @relation(fields: [post_id], references: [id])
+  Category Category @relation(fields: [category_id], references: [id])
+
+  @@map("vh_post_category")
+}
+
+model Media {
+  id          Int      @id @default(autoincrement())
+  url         String
+  url_cdn     String?
+  title       String?
+  alt         String?
+  description String?
+  user_id     Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  User User @relation(fields: [user_id], references: [id])
+
+  @@map("vh_media")
 }

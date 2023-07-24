@@ -6,7 +6,7 @@ import {
   Length,
   MaxLength,
 } from 'class-validator';
-import { Role, Status } from '@prisma/client';
+import { Role, UserStatus } from '@prisma/client';
 
 export class AuthDto {
   @IsNotEmpty()
@@ -26,7 +26,7 @@ export class AuthDto {
 
   @IsOptional()
   @IsString()
-  status: Status;
+  status: UserStatus;
 
   @IsOptional()
   @IsString()
@@ -46,4 +46,14 @@ export class AuthDto {
   @IsString()
   @MaxLength(255)
   avatar: string;
+}
+
+export class LoginDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
 }

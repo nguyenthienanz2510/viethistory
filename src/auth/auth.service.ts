@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as argon from 'argon2';
-import { AuthDto } from './dto';
+import { AuthDto, LoginDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -49,7 +49,7 @@ export class AuthService {
     }
   }
 
-  async login(userDto: AuthDto) {
+  async login(userDto: LoginDto) {
     const user = await this.prismaService.user.findUnique({
       where: {
         email: userDto.email,

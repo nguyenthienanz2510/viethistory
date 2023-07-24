@@ -26,15 +26,15 @@ CREATE TABLE "vh_posts" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "status" TEXT NOT NULL,
-    "thumb" TEXT NOT NULL,
-    "images" TEXT[],
+    "status" "Status" NOT NULL,
+    "thumb" INTEGER,
+    "images" TEXT,
     "content" TEXT NOT NULL,
     "timestamp" TIMESTAMP(3) NOT NULL,
-    "order" TEXT NOT NULL,
-    "meta_title" TEXT NOT NULL,
-    "meta_description" TEXT NOT NULL,
-    "meta_keywords" TEXT NOT NULL,
+    "order" INTEGER,
+    "meta_title" TEXT,
+    "meta_description" TEXT,
+    "meta_keywords" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "user_id" INTEGER NOT NULL,
@@ -45,20 +45,44 @@ CREATE TABLE "vh_posts" (
 -- CreateTable
 CREATE TABLE "vh_categories" (
     "id" SERIAL NOT NULL,
-    "parent_id" INTEGER NOT NULL,
+    "parent_id" INTEGER,
     "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "status" TEXT NOT NULL,
-    "thumb" TEXT NOT NULL,
-    "images" TEXT[],
-    "order" TEXT NOT NULL,
-    "meta_title" TEXT NOT NULL,
-    "meta_description" TEXT NOT NULL,
-    "meta_keywords" TEXT NOT NULL,
+    "thumb" INTEGER,
+    "images" TEXT,
+    "order" INTEGER,
+    "meta_title" TEXT,
+    "meta_description" TEXT,
+    "meta_keywords" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "vh_categories_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "vh_post_category" (
+    "id" SERIAL NOT NULL,
+    "post_id" INTEGER NOT NULL,
+    "category_id" INTEGER NOT NULL,
+
+    CONSTRAINT "vh_post_category_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "vh_media" (
+    "id" SERIAL NOT NULL,
+    "url" TEXT NOT NULL,
+    "url_cdn" TEXT,
+    "title" TEXT,
+    "alt" TEXT,
+    "description" TEXT,
+    "user_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "vh_media_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -66,3 +90,12 @@ CREATE UNIQUE INDEX "vh_users_email_key" ON "vh_users"("email");
 
 -- AddForeignKey
 ALTER TABLE "vh_posts" ADD CONSTRAINT "vh_posts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "vh_post_category" ADD CONSTRAINT "vh_post_category_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "vh_posts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "vh_post_category" ADD CONSTRAINT "vh_post_category_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "vh_categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "vh_media" ADD CONSTRAINT "vh_media_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

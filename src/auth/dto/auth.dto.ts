@@ -9,7 +9,7 @@ import {
 import { Role, UserStatus } from '@prisma/client';
 import { Transform } from 'class-transformer';
 
-export class AuthDto {
+export class CreateUserDto {
   @IsNotEmpty()
   @IsEmail()
   @MaxLength(255)
@@ -56,7 +56,7 @@ export class AuthDto {
   avatar: string;
 }
 
-export class LoginDto {
+export class AuthDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;

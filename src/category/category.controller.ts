@@ -9,7 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { MyJwtGuard } from '../auth/guard';
+import { AccessJwtGuard } from '../auth/guard';
 import { GetUser } from '../auth/decorator';
 import { CategoryService } from './category.service';
 import { InsertCategoryDto, UpdateCategoryDto } from './dto';
@@ -27,7 +27,7 @@ export class CategoryController {
     return this.categoryService.getCategoryById(categoryId);
   }
 
-  @UseGuards(MyJwtGuard)
+  @UseGuards(AccessJwtGuard)
   @Post()
   createCategory(
     @GetUser('id') userId: number,
@@ -36,7 +36,7 @@ export class CategoryController {
     return this.categoryService.createCategory(userId, insertCategoryDto);
   }
 
-  @UseGuards(MyJwtGuard)
+  @UseGuards(AccessJwtGuard)
   @Patch(':id')
   updateCategory(
     @GetUser('id') userId: number,
@@ -50,7 +50,7 @@ export class CategoryController {
     );
   }
 
-  @UseGuards(MyJwtGuard)
+  @UseGuards(AccessJwtGuard)
   @Delete(':id')
   deleteCategory(
     @GetUser('id') userId: number,

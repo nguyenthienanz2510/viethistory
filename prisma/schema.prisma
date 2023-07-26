@@ -33,18 +33,19 @@ enum Status {
 }
 
 model User {
-  id           Int        @id @default(autoincrement())
-  email        String     @unique
-  password     String
-  username     String
-  phone_number String?
-  status       UserStatus @default(active)
-  role         Role       @default(subscriber)
-  first_name   String?
-  last_name    String?
-  avatar       String?
-  created_at   DateTime   @default(now())
-  updated_at   DateTime   @updatedAt
+  id            Int        @id @default(autoincrement())
+  email         String     @unique
+  password      String
+  refresh_token String?
+  username      String
+  phone_number  String?
+  status        UserStatus @default(active)
+  role          Role       @default(subscriber)
+  first_name    String?
+  last_name     String?
+  avatar        String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
   Posts             Post[]     @relation("User")
   PostsUpdated      Post[]     @relation("UserUpdated")

@@ -9,7 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { MyJwtGuard } from '../auth/guard';
+import { AccessJwtGuard } from '../auth/guard';
 import { PostService } from './post.service';
 import { GetUser } from '../auth/decorator';
 import { InsertPostDto, UpdatePostDto } from './dto';
@@ -27,7 +27,7 @@ export class PostController {
     return this.postService.getPostById(postId);
   }
 
-  @UseGuards(MyJwtGuard)
+  @UseGuards(AccessJwtGuard)
   @Post()
   createPost(
     @GetUser('id') userId: number,
@@ -36,7 +36,7 @@ export class PostController {
     return this.postService.createPost(userId, insertPostDto);
   }
 
-  @UseGuards(MyJwtGuard)
+  @UseGuards(AccessJwtGuard)
   @Patch(':id')
   updatePost(
     @GetUser('id') userId: number,
@@ -46,7 +46,7 @@ export class PostController {
     return this.postService.updatePost(userId, postId, updatePostDto);
   }
 
-  @UseGuards(MyJwtGuard)
+  @UseGuards(AccessJwtGuard)
   @Delete(':id')
   deletePost(
     @GetUser('id') userId: number,

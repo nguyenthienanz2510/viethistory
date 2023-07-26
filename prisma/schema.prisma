@@ -28,7 +28,7 @@ enum UserStatus {
 enum Status {
   private
   draft
-  public
+  publish
   deleted
 }
 
@@ -36,6 +36,7 @@ model User {
   id           Int        @id @default(autoincrement())
   email        String     @unique
   password     String
+  username     String
   phone_number String?
   status       UserStatus @default(active)
   role         Role       @default(subscriber)
@@ -45,15 +46,19 @@ model User {
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt
 
-  Posts Post[]
-  Media Media[]
+  Posts             Post[]     @relation("User")
+  PostsUpdated      Post[]     @relation("UserUpdated")
+  Media             Media[]
+  Categories        Category[] @relation("User")
+  CategoriesUpdated Category[] @relation("UserUpdated")
 
   @@map("vh_users")
 }
 
 model Post {
-  id               Int        @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
   title            String
+  slug             String?
   description      String
   status           Status
   thumb            Int?
@@ -64,11 +69,13 @@ model Post {
   meta_title       String?
   meta_description String?
   meta_keywords    String?
-  created_at       DateTime   @default(now())
-  updated_at       DateTime   @updatedAt
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
   user_id          Int
+  updated_by       Int
 
-  User         User           @relation(fields: [user_id], references: [id])
+  UserUpdated  User           @relation("UserUpdated", fields: [updated_by], references: [id])
+  User         User           @relation("User", fields: [user_id], references: [id])
   PostCategory PostCategory[]
 
   @@map("vh_posts")
@@ -78,8 +85,9 @@ model Category {
   id               Int      @id @default(autoincrement())
   parent_id        Int?
   name             String
+  slug             String?
   description      String?
-  status           String
+  status           Status
   thumb            Int?
   images           String?
   order            Int?
@@ -88,6 +96,11 @@ model Category {
   meta_keywords    String?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
+  user_id          Int
+  updated_by       Int
+
+  UserUpdated User @relation("UserUpdated", fields: [updated_by], references: [id])
+  User        User @relation("User", fields: [user_id], references: [id])
 
   PostCategory PostCategory[]
 

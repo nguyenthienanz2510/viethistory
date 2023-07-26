@@ -1,34 +1,35 @@
 import { Status } from '@prisma/client';
-import { Transform } from 'class-transformer';
 import {
   IsArray,
-  IsDateString,
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   MaxLength,
 } from 'class-validator';
 
-export class InsertPostDto {
-  @IsNotEmpty()
+export class UpdateCategoryDto {
+  @IsOptional()
   @IsString()
   @MaxLength(255)
-  title: string;
+  name?: string;
 
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   slug?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
+  @IsNumber()
+  parent_id?;
+
+  @IsOptional()
   @IsString()
   @MaxLength(255)
-  description: string;
+  description?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  @Transform(({ value }) => value || 'publish')
-  status: Status;
+  status?: Status;
 
   @IsOptional()
   @IsString()
@@ -38,14 +39,6 @@ export class InsertPostDto {
   @IsArray()
   images?: string;
 
-  @IsNotEmpty()
-  @IsString()
-  content: string;
-
-  @IsNotEmpty()
-  @IsDateString()
-  timestamp: string;
-
   @IsOptional()
   @IsNumber()
   order?: number;
@@ -53,19 +46,21 @@ export class InsertPostDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  meta_title?: string;
+  meta_title?;
 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  meta_description?: string;
+  meta_description?;
 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  meta_keywords?: string;
+  meta_keywords?;
 
-  user_id: number;
+  @IsOptional()
+  @IsNumber()
+  user_id?: number;
 
   updated_by: number;
 }

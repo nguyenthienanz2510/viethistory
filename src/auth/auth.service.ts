@@ -77,7 +77,7 @@ export class AuthService {
     return tokens;
   }
 
-  async logout(userId: number) {
+  async logout(userId: string) {
     await this.prismaService.user.update({
       where: { id: userId },
       data: { refresh_token: null },
@@ -87,7 +87,7 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(userId: number, refreshToken: string) {
+  async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
     });
@@ -109,7 +109,7 @@ export class AuthService {
   }
 
   async convertObjectToJwtString(
-    userId: number,
+    userId: string,
     email: string,
   ): Promise<{ accessToken: string }> {
     const payload = {
@@ -131,7 +131,7 @@ export class AuthService {
     return argon.hash(data);
   }
 
-  async updateRefreshToken(userId: number, refreshToken: string) {
+  async updateRefreshToken(userId: string, refreshToken: string) {
     const hashedRefreshToken = await this.hashData(refreshToken);
     await this.prismaService.user.update({
       where: {
@@ -143,7 +143,7 @@ export class AuthService {
     });
   }
 
-  async getTokens(userId: number, email: string) {
+  async getTokens(userId: string, email: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
@@ -152,7 +152,7 @@ export class AuthService {
         },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-          expiresIn: '1m',
+          expiresIn: '10m',
         },
       ),
       this.jwtService.signAsync(

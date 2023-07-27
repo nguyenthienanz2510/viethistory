@@ -14,6 +14,7 @@ export class UpdatePostDto {
   @MaxLength(255)
   title?: string;
 
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   slug?: string;
@@ -64,7 +65,7 @@ export class UpdatePostDto {
 
   @IsOptional()
   @IsNumber()
-  user_id?: number;
+  user_id?: string;
 
-  updated_by: number;
+  user_updated_id: string;
 }

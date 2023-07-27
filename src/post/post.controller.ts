@@ -30,7 +30,7 @@ export class PostController {
   @UseGuards(AccessJwtGuard)
   @Post()
   createPost(
-    @GetUser('id') userId: number,
+    @GetUser('id') userId: string,
     @Body() insertPostDto: InsertPostDto,
   ) {
     return this.postService.createPost(userId, insertPostDto);
@@ -39,7 +39,7 @@ export class PostController {
   @UseGuards(AccessJwtGuard)
   @Patch(':id')
   updatePost(
-    @GetUser('id') userId: number,
+    @GetUser('id') userId: string,
     @Param('id', ParseIntPipe) postId: number,
     @Body() updatePostDto: UpdatePostDto,
   ) {
@@ -49,7 +49,7 @@ export class PostController {
   @UseGuards(AccessJwtGuard)
   @Delete(':id')
   deletePost(
-    @GetUser('id') userId: number,
+    @GetUser('id') userId: string,
     @Param('id', ParseIntPipe) postId: number,
   ) {
     return this.postService.deletePost(userId, postId);

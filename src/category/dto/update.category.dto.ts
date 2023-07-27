@@ -60,7 +60,7 @@ export class UpdateCategoryDto {
 
   @IsOptional()
   @IsNumber()
-  user_id?: number;
+  user_id?: string;
 
-  updated_by: number;
+  user_updated_id: string;
 }

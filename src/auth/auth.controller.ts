@@ -21,7 +21,7 @@ export class AuthController {
 
   @UseGuards(AccessJwtGuard)
   @Get('logout')
-  logout(@GetUser('id') userId: number) {
+  logout(@GetUser('id') userId: string) {
     return this.authService.logout(userId);
   }
 

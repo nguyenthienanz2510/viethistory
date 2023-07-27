@@ -21,19 +21,19 @@ export class CategoryService {
     return category;
   }
 
-  async createCategory(userId: number, insertCategoryDto: InsertCategoryDto) {
+  async createCategory(userId: string, insertCategoryDto: InsertCategoryDto) {
     const category = await this.prismaService.category.create({
       data: {
         ...insertCategoryDto,
         user_id: userId,
-        updated_by: userId,
+        user_updated_id: userId,
       },
     });
     return category;
   }
 
   async updateCategory(
-    userId: number,
+    userId: string,
     categoryId: number,
     updateCategoryDto: UpdateCategoryDto,
   ) {
@@ -47,12 +47,12 @@ export class CategoryService {
       where: { id: categoryId },
       data: {
         ...updateCategoryDto,
-        updated_by: userId,
+        user_updated_id: userId,
       },
     });
   }
 
-  async deleteCategory(userId: number, categoryId: number) {
+  async deleteCategory(userId: string, categoryId: number) {
     const category = await this.prismaService.category.findUnique({
       where: { id: categoryId },
     });

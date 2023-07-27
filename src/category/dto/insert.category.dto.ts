@@ -63,5 +63,5 @@ export class InsertCategoryDto {
 
   user_id: number;
 
-  updated_by: number;
+  user_updated_id: number;
 }

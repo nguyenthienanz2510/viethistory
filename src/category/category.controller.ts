@@ -30,7 +30,7 @@ export class CategoryController {
   @UseGuards(AccessJwtGuard)
   @Post()
   createCategory(
-    @GetUser('id') userId: number,
+    @GetUser('id') userId: string,
     @Body() insertCategoryDto: InsertCategoryDto,
   ) {
     return this.categoryService.createCategory(userId, insertCategoryDto);
@@ -39,7 +39,7 @@ export class CategoryController {
   @UseGuards(AccessJwtGuard)
   @Patch(':id')
   updateCategory(
-    @GetUser('id') userId: number,
+    @GetUser('id') userId: string,
     @Param('id', ParseIntPipe) categoryId: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
@@ -53,7 +53,7 @@ export class CategoryController {
   @UseGuards(AccessJwtGuard)
   @Delete(':id')
   deleteCategory(
-    @GetUser('id') userId: number,
+    @GetUser('id') userId: string,
     @Param('id', ParseIntPipe) categoryId: number,
   ) {
     return this.categoryService.deleteCategory(userId, categoryId);

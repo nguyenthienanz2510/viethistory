@@ -16,6 +16,7 @@ export class InsertPostDto {
   @MaxLength(255)
   title: string;
 
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   slug?: string;
@@ -65,7 +66,7 @@ export class InsertPostDto {
   @MaxLength(255)
   meta_keywords?: string;
 
-  user_id: number;
+  user_id: string;
 
-  updated_by: number;
+  user_updated_id: string;
 }

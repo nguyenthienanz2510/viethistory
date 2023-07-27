@@ -15,7 +15,7 @@ export class accessJwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       secretOrKey: configService.get('JWT_ACCESS_SECRET'),
     });
   }
-  async validate(payload: { sub: number; email: string }) {
+  async validate(payload: { sub: string; email: string }) {
     const user = await this.prismaService.user.findUnique({
       where: {
         id: payload.sub,

@@ -1,51 +1,122 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { InsertPostDto, UpdatePostDto } from './dto';
+import { BaseService } from '../base/base.service';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly baseService: BaseService,
+  ) {}
 
   async getPosts() {
     const posts = await this.prismaService.post.findMany();
-    return posts;
+    return this.baseService.generateSuccessResponse(
+      HttpStatus.OK,
+      'Posts fetched successfully',
+      { posts },
+    );
   }
 
   async getPostById(postId: number) {
+    await this.checkPostExist(postId);
     const post = await this.prismaService.post.findUnique({
       where: { id: postId },
+      include: {
+        user: true,
+        user_update: true,
+      },
     });
-    return post;
+    return this.baseService.generateSuccessResponse(
+      HttpStatus.OK,
+      'Post fetched successfully',
+      { post },
+    );
   }
 
-  async createPost(userId: number, insertPostDto: InsertPostDto) {
+  async createPost(userId: string, insertPostDto: InsertPostDto) {
+    const slug = await this.getUniqueSlug(insertPostDto.title);
     const post = await this.prismaService.post.create({
       data: {
         ...insertPostDto,
         user_id: userId,
+        user_updated_id: userId,
+        slug,
       },
     });
-    return post;
+    return this.baseService.generateSuccessResponse(
+      HttpStatus.CREATED,
+      'Post created successfully',
+      { post },
+    );
   }
 
   async updatePost(
-    userId: number,
+    userId: string,
     postId: number,
     updatePostDto: UpdatePostDto,
   ) {
+    await this.checkPostExist(postId);
     const post = await this.prismaService.post.update({
       where: { id: postId },
-      data: {
-        ...updatePostDto,
-      },
+      data: { ...updatePostDto, user_updated_id: userId },
     });
-    return post;
+    return this.baseService.generateSuccessResponse(
+      HttpStatus.OK,
+      'Post updated successfully',
+      { post },
+    );
   }
 
-  async deletePost(userId: number, postId: number) {
+  async deletePost(userId: string, postId: number) {
+    await this.checkPostExist(postId);
     const post = await this.prismaService.post.delete({
       where: { id: postId },
     });
-    return post;
+    return this.baseService.generateSuccessResponse(
+      HttpStatus.OK,
+      'Post deleted successfully',
+      { post },
+    );
+  }
+
+  private async getUniqueSlug(title: string): Promise<string> {
+    let counter = 1;
+    let slug = this.generateSlug(title);
+
+    while (true) {
+      const existingPost = await this.prismaService.post.findFirst({
+        where: {
+          slug,
+        },
+      });
+
+      if (!existingPost) {
+        return slug;
+      }
+
+      slug = this.generateSlug(`${title} ${counter}`);
+      counter++;
+    }
+  }
+
+  private generateSlug(title: string): string {
+    let slug: string;
+
+    slug = title.toLowerCase();
+    slug = slug.replace(/\s+/g, '-');
+    slug = slug.replace(/[^\w-]/g, '');
+
+    return slug;
+  }
+
+  private async checkPostExist(postId: number) {
+    const post = await this.prismaService.post.findUnique({
+      where: { id: postId },
+    });
+    if (!post) {
+      throw new ForbiddenException('Post not found');
+    }
   }
 }

@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { CategoryModule } from './category/category.module';
 import { BaseModule } from './base/base.module';
+import { InitModule } from './init/init.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { BaseModule } from './base/base.module';
     PostModule,
     CategoryModule,
     BaseModule,
+    InitModule,
   ],
 })
 export class AppModule {}

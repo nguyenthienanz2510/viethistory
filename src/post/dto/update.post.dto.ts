@@ -1,4 +1,3 @@
-import { Status } from '@prisma/client';
 import {
   IsArray,
   IsDateString,
@@ -26,7 +25,7 @@ export class UpdatePostDto {
 
   @IsOptional()
   @IsString()
-  status?: Status;
+  status?: string;
 
   @IsOptional()
   @IsString()
@@ -63,9 +62,7 @@ export class UpdatePostDto {
   @MaxLength(255)
   meta_keywords?: string;
 
-  @IsOptional()
-  @IsNumber()
-  user_id?: string;
+  user_created_id?: string;
 
   user_updated_id: string;
 }

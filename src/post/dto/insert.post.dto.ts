@@ -1,4 +1,3 @@
-import { Status } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   IsArray,
@@ -29,7 +28,7 @@ export class InsertPostDto {
   @IsNotEmpty()
   @IsString()
   @Transform(({ value }) => value || 'publish')
-  status: Status;
+  status: string;
 
   @IsOptional()
   @IsString()
@@ -66,7 +65,7 @@ export class InsertPostDto {
   @MaxLength(255)
   meta_keywords?: string;
 
-  user_id: string;
+  user_created_id: string;
 
   user_updated_id: string;
 }

@@ -10,43 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  admin
-  manager
-  editor
-  author
-  subscriber
-}
-
-enum UserStatus {
-  active
-  inactive
-  blocked
-  deleted
-}
-
-enum Status {
-  private
-  draft
-  publish
-  deleted
-}
-
 model User {
-  id            String     @id @unique @default(cuid())
-  email         String     @unique
+  id            String   @id @unique @default(cuid())
+  email         String   @unique
   password      String
   refresh_token String?
-  username      String
+  username      String   @unique
   phone_number  String?
-  status        UserStatus @default(active)
-  role          Role       @default(subscriber)
+  role          String
+  status        String
   first_name    String?
   last_name     String?
   avatar        String?
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
+  role_name          Role       @relation(fields: [role], references: [name])
+  status_name        UserStatus @relation(fields: [status], references: [name])
   posts              Post[]     @relation("user")
   posts_updated      Post[]     @relation("user_update")
   media              Media[]    @relation("user")
@@ -57,12 +37,28 @@ model User {
   @@map("vh_users")
 }
 
+model Role {
+  id   Int    @id @unique @default(autoincrement())
+  name String @unique
+  User User[]
+
+  @@map("vh_roles")
+}
+
+model UserStatus {
+  id   Int    @id @unique @default(autoincrement())
+  name String @unique
+  User User[]
+
+  @@map("vh_user_status")
+}
+
 model Post {
   id               Int      @id @default(autoincrement())
   title            String
-  slug             String?
+  slug             String?  @unique
   description      String
-  status           Status
+  status           String
   thumb            Int?
   images           String?
   content          String
@@ -73,11 +69,12 @@ model Post {
   meta_keywords    String?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
-  user_id          String
+  user_created_id  String
   user_updated_id  String
 
-  user_update   User           @relation("user_update", fields: [user_updated_id], references: [id])
-  user          User           @relation("user", fields: [user_id], references: [id])
+  status_name   Status         @relation(fields: [status], references: [name])
+  user_updated  User           @relation("user_update", fields: [user_updated_id], references: [id])
+  user_created  User           @relation("user", fields: [user_created_id], references: [id])
   post_category PostCategory[]
 
   @@map("vh_posts")
@@ -87,9 +84,9 @@ model Category {
   id               Int      @id @default(autoincrement())
   parent_id        Int?
   name             String
-  slug             String?
+  slug             String?  @unique
   description      String?
-  status           Status
+  status           String
   thumb            Int?
   images           String?
   order            Int?
@@ -98,15 +95,27 @@ model Category {
   meta_keywords    String?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
-  user_id          String
+  user_created_id  String
   user_updated_id  String
 
-  user_update User @relation("user_update", fields: [user_updated_id], references: [id])
-  user        User @relation("user", fields: [user_id], references: [id])
+  status_name  Status @relation(fields: [status], references: [name])
+  user_updated User   @relation("user_update", fields: [user_updated_id], references: [id])
+  user_created User   @relation("user", fields: [user_created_id], references: [id])
 
   post_category PostCategory[]
 
   @@map("vh_categories")
+}
+
+model Status {
+  id   Int    @id @unique @default(autoincrement())
+  name String @unique
+
+  Post     Post[]
+  Category Category[]
+  Media    Media[]
+
+  @@map("vh_status")
 }
 
 model PostCategory {
@@ -127,13 +136,15 @@ model Media {
   title           String?
   alt             String?
   description     String?
+  status          String
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
-  user_id         String
+  user_created_id String
   user_updated_id String
 
-  user_update User @relation("user_update", fields: [user_updated_id], references: [id])
-  user        User @relation("user", fields: [user_id], references: [id])
+  status_name  Status @relation(fields: [status], references: [name])
+  user_updated User   @relation("user_update", fields: [user_updated_id], references: [id])
+  user_created User   @relation("user", fields: [user_created_id], references: [id])
 
   @@map("vh_media")
 }

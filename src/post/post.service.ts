@@ -11,7 +11,12 @@ export class PostService {
   ) {}
 
   async getPosts() {
-    const posts = await this.prismaService.post.findMany();
+    const posts = await this.prismaService.post.findMany({
+      include: {
+        user_created: true,
+        user_updated: true,
+      },
+    });
     return this.baseService.generateSuccessResponse(
       HttpStatus.OK,
       'Posts fetched successfully',
@@ -24,8 +29,8 @@ export class PostService {
     const post = await this.prismaService.post.findUnique({
       where: { id: postId },
       include: {
-        user: true,
-        user_update: true,
+        user_created: true,
+        user_updated: true,
       },
     });
     return this.baseService.generateSuccessResponse(
@@ -36,11 +41,14 @@ export class PostService {
   }
 
   async createPost(userId: string, insertPostDto: InsertPostDto) {
-    const slug = await this.getUniqueSlug(insertPostDto.title);
+    const slug = await this.baseService.generateUniqueSlug(
+      insertPostDto.title,
+      'post',
+    );
     const post = await this.prismaService.post.create({
       data: {
         ...insertPostDto,
-        user_id: userId,
+        user_created_id: userId,
         user_updated_id: userId,
         slug,
       },
@@ -79,36 +87,6 @@ export class PostService {
       'Post deleted successfully',
       { post },
     );
-  }
-
-  private async getUniqueSlug(title: string): Promise<string> {
-    let counter = 1;
-    let slug = this.generateSlug(title);
-
-    while (true) {
-      const existingPost = await this.prismaService.post.findFirst({
-        where: {
-          slug,
-        },
-      });
-
-      if (!existingPost) {
-        return slug;
-      }
-
-      slug = this.generateSlug(`${title} ${counter}`);
-      counter++;
-    }
-  }
-
-  private generateSlug(title: string): string {
-    let slug: string;
-
-    slug = title.toLowerCase();
-    slug = slug.replace(/\s+/g, '-');
-    slug = slug.replace(/[^\w-]/g, '');
-
-    return slug;
   }
 
   private async checkPostExist(postId: number) {

@@ -1,4 +1,3 @@
-import { Status } from '@prisma/client';
 import {
   IsArray,
   IsNumber,
@@ -29,7 +28,7 @@ export class UpdateCategoryDto {
 
   @IsOptional()
   @IsString()
-  status?: Status;
+  status?: string;
 
   @IsOptional()
   @IsString()
@@ -60,7 +59,7 @@ export class UpdateCategoryDto {
 
   @IsOptional()
   @IsNumber()
-  user_id?: string;
+  user_created_id?: string;
 
   user_updated_id: string;
 }

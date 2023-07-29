@@ -43,7 +43,7 @@ CREATE TABLE "vh_posts" (
     "meta_keywords" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "user_created_id" TEXT NOT NULL,
     "user_updated_id" TEXT NOT NULL,
 
     CONSTRAINT "vh_posts_pkey" PRIMARY KEY ("id")
@@ -65,7 +65,7 @@ CREATE TABLE "vh_categories" (
     "meta_keywords" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "user_created_id" TEXT NOT NULL,
     "user_updated_id" TEXT NOT NULL,
 
     CONSTRAINT "vh_categories_pkey" PRIMARY KEY ("id")
@@ -88,7 +88,7 @@ CREATE TABLE "vh_media" (
     "title" TEXT,
     "alt" TEXT,
     "description" TEXT,
-    "user_id" TEXT NOT NULL,
+    "user_created_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -105,13 +105,13 @@ CREATE UNIQUE INDEX "vh_users_email_key" ON "vh_users"("email");
 ALTER TABLE "vh_posts" ADD CONSTRAINT "vh_posts_user_updated_id_fkey" FOREIGN KEY ("user_updated_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "vh_posts" ADD CONSTRAINT "vh_posts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "vh_posts" ADD CONSTRAINT "vh_posts_user_created_id_fkey" FOREIGN KEY ("user_created_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "vh_categories" ADD CONSTRAINT "vh_categories_user_updated_id_fkey" FOREIGN KEY ("user_updated_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "vh_categories" ADD CONSTRAINT "vh_categories_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "vh_categories" ADD CONSTRAINT "vh_categories_user_created_id_fkey" FOREIGN KEY ("user_created_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "vh_post_category" ADD CONSTRAINT "vh_post_category_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "vh_posts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -120,4 +120,4 @@ ALTER TABLE "vh_post_category" ADD CONSTRAINT "vh_post_category_post_id_fkey" FO
 ALTER TABLE "vh_post_category" ADD CONSTRAINT "vh_post_category_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "vh_categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "vh_media" ADD CONSTRAINT "vh_media_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "vh_media" ADD CONSTRAINT "vh_media_user_created_id_fkey" FOREIGN KEY ("user_created_id") REFERENCES "vh_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

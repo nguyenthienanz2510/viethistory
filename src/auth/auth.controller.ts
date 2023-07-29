@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, AuthDto } from './dto';
+import { UserCreateDto, AuthDto } from './dto';
 import { GetUser } from './decorator';
 import { AccessJwtGuard, RefreshJwtGuard } from './guard';
 import { Request } from 'express';
@@ -10,7 +10,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() userDto: CreateUserDto) {
+  register(@Body() userDto: UserCreateDto) {
     return this.authService.register(userDto);
   }
 

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as argon from 'argon2';
-import { CreateUserDto, AuthDto } from './dto';
+import { UserCreateDto, AuthDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
-  async register(userDto: CreateUserDto) {
+  async register(userDto: UserCreateDto) {
     const userExists = await this.prismaService.user.findUnique({
       where: { email: userDto.email },
     });

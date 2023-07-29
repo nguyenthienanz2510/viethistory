@@ -1,4 +1,3 @@
-import { Status } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   IsArray,
@@ -32,7 +31,7 @@ export class InsertCategoryDto {
   @IsOptional()
   @IsString()
   @Transform(({ value }) => value || 'publish')
-  status: Status;
+  status: string;
 
   @IsOptional()
   @IsString()
@@ -61,7 +60,7 @@ export class InsertCategoryDto {
   @MaxLength(255)
   meta_keywords?;
 
-  user_id: number;
+  user_created_id: string;
 
-  user_updated_id: number;
+  user_updated_id: string;
 }

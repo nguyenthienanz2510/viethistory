@@ -3,12 +3,14 @@ import { AppModule } from '../src/app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
 import * as pactum from 'pactum';
+import { InitService } from '../src/init/init.service';
 
 const PORT = 4001;
 
 describe('APP ENDTOEND TEST', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
+  let initService: InitService;
   beforeAll(async () => {
     const appModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -20,6 +22,10 @@ describe('APP ENDTOEND TEST', () => {
     console.log(`listening app test on port ${PORT}`);
     prismaService = app.get(PrismaService);
     await prismaService.cleanDatabase();
+
+    initService = app.get(InitService);
+    await initService.initDatabase();
+
     pactum.request.setBaseUrl(`http://localhost:${PORT}`);
   });
 
@@ -32,6 +38,8 @@ describe('APP ENDTOEND TEST', () => {
           .withBody({
             email: 'andreenguyen@gmail.com',
             password: 'umap12345',
+            role: 'admin',
+            status: 'active',
           })
           .expectStatus(201);
       });
@@ -43,8 +51,10 @@ describe('APP ENDTOEND TEST', () => {
           .withBody({
             email: 'andreenguyen@gmail.com',
             password: 'umap12345',
+            role: 'admin',
+            status: 'active',
           })
-          .expectStatus(403);
+          .expectStatus(400);
       });
 
       it('should error when email invalid', () => {
@@ -54,6 +64,8 @@ describe('APP ENDTOEND TEST', () => {
           .withBody({
             email: 'andreenguyen',
             password: 'umap12345',
+            role: 'admin',
+            status: 'active',
           })
           .expectStatus(400);
       });
@@ -65,6 +77,8 @@ describe('APP ENDTOEND TEST', () => {
           .withBody({
             email: '',
             password: 'umap12345',
+            role: 'admin',
+            status: 'active',
           })
           .expectStatus(400);
       });
@@ -76,6 +90,8 @@ describe('APP ENDTOEND TEST', () => {
           .withBody({
             email: 'andreenguyen02@gmail.com',
             password: '',
+            role: 'admin',
+            status: 'active',
           })
           .expectStatus(400);
       });
@@ -91,7 +107,8 @@ describe('APP ENDTOEND TEST', () => {
             password: 'umap12345',
           })
           .expectStatus(201)
-          .stores('accessToken', 'accessToken');
+          .stores('accessToken', 'accessToken')
+          .stores('refreshToken', 'refreshToken');
       });
 
       it('should error when email not found', () => {
@@ -102,7 +119,7 @@ describe('APP ENDTOEND TEST', () => {
             email: 'andreenguyennotfound@gmail.com',
             password: 'umap12345',
           })
-          .expectStatus(403);
+          .expectStatus(400);
       });
 
       it('should error when email invalid', () => {
@@ -145,7 +162,7 @@ describe('APP ENDTOEND TEST', () => {
             email: 'andreenguyen02@gmail.com',
             password: 'umap44444',
           })
-          .expectStatus(403);
+          .expectStatus(400);
       });
     });
 

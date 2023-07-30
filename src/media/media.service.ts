@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InsertMediaDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class MediaService {
@@ -30,6 +32,24 @@ export class MediaService {
     );
 
     return mediaInsert;
+  }
+
+  async deleteMedia(userId: string, mediaId: number) {
+    const mediaDelete = await this.prismaService.media.delete({
+      where: {
+        id: mediaId,
+      },
+    });
+    const filePath = path.join(
+      __dirname,
+      '..',
+      '..',
+      'public',
+      'uploads',
+      mediaDelete.filename,
+    );
+    fs.unlinkSync(filePath);
+    return mediaDelete;
   }
 
   private removePublicPrefix(filePath: string): string {

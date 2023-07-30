@@ -2,6 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
+  Param,
+  ParseIntPipe,
   Post,
   UploadedFiles,
   UseGuards,
@@ -20,7 +23,7 @@ export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
   @UseGuards(AccessJwtGuard)
-  @Post('upload')
+  @Post()
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       storage: diskStorage({
@@ -58,5 +61,14 @@ export class MediaController {
     @Body() insertMediaDto: InsertMediaDto,
   ) {
     return this.mediaService.uploadFiles(userId, files, insertMediaDto);
+  }
+
+  @UseGuards(AccessJwtGuard)
+  @Delete(':id')
+  deleteMedia(
+    @GetUser('id') userId: string,
+    @Param('id', ParseIntPipe) mediaId: number,
+  ) {
+    return this.mediaService.deleteMedia(userId, mediaId);
   }
 }

@@ -23,17 +23,16 @@ export class InitService {
     const existingRoles = await this.prismaService.role.findMany();
 
     if (existingRoles.length === 0) {
-      const insert = await this.prismaService.role.createMany({
-        data: roles.map((name) => ({ name })),
-      });
-      return {
-        inserted: insert.count,
-        data: roles,
-      };
+      return await this.prismaService.$transaction(
+        roles.map((name) =>
+          this.prismaService.role.create({
+            data: { name: name },
+          }),
+        ),
+      );
     } else {
       return {
-        inserted: 0,
-        data: existingRoles,
+        existingRoles,
       };
     }
   }
@@ -43,17 +42,16 @@ export class InitService {
     const existingUserStatus = await this.prismaService.userStatus.findMany();
 
     if (existingUserStatus.length === 0) {
-      const insert = await this.prismaService.userStatus.createMany({
-        data: userStatus.map((name) => ({ name })),
-      });
-      return {
-        inserted: insert.count,
-        data: userStatus,
-      };
+      return await this.prismaService.$transaction(
+        userStatus.map((name) =>
+          this.prismaService.userStatus.create({
+            data: { name: name },
+          }),
+        ),
+      );
     } else {
       return {
-        inserted: 0,
-        data: existingUserStatus,
+        existingUserStatus,
       };
     }
   }
@@ -63,17 +61,16 @@ export class InitService {
     const existingStatus = await this.prismaService.status.findMany();
 
     if (existingStatus.length === 0) {
-      const insert = await this.prismaService.status.createMany({
-        data: postStatus.map((name) => ({ name })),
-      });
-      return {
-        inserted: insert.count,
-        data: postStatus,
-      };
+      return await this.prismaService.$transaction(
+        postStatus.map((name) =>
+          this.prismaService.status.create({
+            data: { name: name },
+          }),
+        ),
+      );
     } else {
       return {
-        inserted: 0,
-        data: existingStatus,
+        existingStatus,
       };
     }
   }

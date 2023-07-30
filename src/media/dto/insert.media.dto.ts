@@ -1,7 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 
 export class InsertMediaDto {
-  encoding: string;
   mimetype: string;
   destination: string;
   filename: string;

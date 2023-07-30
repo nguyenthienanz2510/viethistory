@@ -131,7 +131,6 @@ model PostCategory {
 
 model Media {
   id              Int      @id @default(autoincrement())
-  encoding        String
   mimetype        String
   destination     String
   filename        String

@@ -16,11 +16,10 @@ export class MediaService {
         this.prismaService.media.create({
           data: {
             ...insertMediaDto,
-            encoding: file.encoding,
             mimetype: file.mimetype,
             destination: file.destination,
             filename: file.filename,
-            path: file.path,
+            path: this.removePublicPrefix(file.path),
             size: file.size,
             status: insertMediaDto.status || 'publish',
             user_created_id: userId,
@@ -31,5 +30,13 @@ export class MediaService {
     );
 
     return mediaInsert;
+  }
+
+  private removePublicPrefix(filePath: string): string {
+    const publicPrefix = 'public/';
+    if (filePath.startsWith(publicPrefix)) {
+      return filePath.substring(publicPrefix.length);
+    }
+    return filePath;
   }
 }

@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CategoryModule } from './category/category.module';
 import { BaseModule } from './base/base.module';
 import { InitModule } from './init/init.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { InitModule } from './init/init.module';
     CategoryModule,
     BaseModule,
     InitModule,
+    MediaModule,
   ],
 })
 export class AppModule {}

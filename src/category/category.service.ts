@@ -51,6 +51,7 @@ export class CategoryService {
         user_created_id: userId,
         user_updated_id: userId,
         slug,
+        status: insertCategoryDto.status || 'publish',
       },
     });
     return this.baseService.generateSuccessResponse(

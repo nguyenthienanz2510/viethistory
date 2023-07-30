@@ -131,7 +131,12 @@ model PostCategory {
 
 model Media {
   id              Int      @id @default(autoincrement())
-  url             String
+  encoding        String
+  mimetype        String
+  destination     String
+  filename        String
+  path            String
+  size            Int
   url_cdn         String?
   title           String?
   alt             String?

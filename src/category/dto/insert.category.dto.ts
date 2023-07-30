@@ -1,4 +1,3 @@
-import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsNotEmpty,
@@ -30,7 +29,6 @@ export class InsertCategoryDto {
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => value || 'publish')
   status: string;
 
   @IsOptional()

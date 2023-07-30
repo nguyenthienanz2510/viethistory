@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as argon from 'argon2';
-import { UserCreateDto, AuthDto } from './dto';
+import { InsertUserDto, AuthDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
-  async register(userDto: UserCreateDto) {
+  async register(userDto: InsertUserDto) {
     const userExists = await this.prismaService.user.findUnique({
       where: { email: userDto.email },
     });
@@ -28,15 +28,11 @@ export class AuthService {
       const hashedPassword = await argon.hash(userDto.password);
       const user = await this.prismaService.user.create({
         data: {
-          email: userDto.email,
+          ...userDto,
           username: userDto.username || userDto.email,
           password: hashedPassword,
-          phone_number: userDto.phone_number,
-          status: userDto.status,
-          role: userDto.role,
-          first_name: userDto.first_name,
-          last_name: userDto.last_name,
-          avatar: userDto.avatar,
+          role: userDto.role || 'subscriber',
+          status: userDto.status || 'active',
         },
       });
 

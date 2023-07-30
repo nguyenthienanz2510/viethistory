@@ -1,4 +1,3 @@
-import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsDateString,
@@ -25,9 +24,8 @@ export class InsertPostDto {
   @MaxLength(255)
   description: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  @Transform(({ value }) => value || 'publish')
   status: string;
 
   @IsOptional()

@@ -6,9 +6,8 @@ import {
   Length,
   MaxLength,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
 
-export class UserCreateDto {
+export class InsertUserDto {
   @IsNotEmpty()
   @IsEmail()
   @MaxLength(255)
@@ -22,7 +21,6 @@ export class UserCreateDto {
   @IsOptional()
   @IsString()
   @MaxLength(15)
-  @Transform(({ value }) => value || 'yourusername')
   username?: string;
 
   @IsOptional()
@@ -32,7 +30,6 @@ export class UserCreateDto {
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => value || 'active')
   status: string;
 
   @IsOptional()

@@ -3,8 +3,10 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UploadedFiles,
   UseGuards,
@@ -15,12 +17,24 @@ import { diskStorage } from 'multer';
 import { basename, extname } from 'path';
 import { AccessJwtGuard } from '../auth/guard';
 import { GetUser } from '../auth/decorator';
-import { InsertMediaDto } from './dto';
+import { InsertMediaDto, UpdateMediaDto } from './dto';
 import { MediaService } from './media.service';
 
 @Controller('media')
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
+
+  @UseGuards(AccessJwtGuard)
+  @Get()
+  getMedia() {
+    return this.mediaService.getMedia();
+  }
+
+  @UseGuards(AccessJwtGuard)
+  @Get(':id')
+  getMediaById(@Param('id', ParseIntPipe) mediaId: number) {
+    return this.mediaService.getMediaById(mediaId);
+  }
 
   @UseGuards(AccessJwtGuard)
   @Post()
@@ -61,6 +75,16 @@ export class MediaController {
     @Body() insertMediaDto: InsertMediaDto,
   ) {
     return this.mediaService.uploadFiles(userId, files, insertMediaDto);
+  }
+
+  @UseGuards(AccessJwtGuard)
+  @Patch(':id')
+  updateMedia(
+    @GetUser('id') userId: string,
+    @Param('id', ParseIntPipe) mediaId: number,
+    @Body() updateMediaDto: UpdateMediaDto,
+  ) {
+    return this.mediaService.updateMedia(userId, mediaId, updateMediaDto);
   }
 
   @UseGuards(AccessJwtGuard)

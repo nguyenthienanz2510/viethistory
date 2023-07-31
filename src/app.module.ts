@@ -8,6 +8,8 @@ import { CategoryModule } from './category/category.module';
 import { BaseModule } from './base/base.module';
 import { InitModule } from './init/init.module';
 import { MediaModule } from './media/media.module';
+import { APP_FILTER } from '@nestjs/core';
+import { HttpExceptionFilter } from './http-exception.filter';
 
 @Module({
   imports: [
@@ -20,6 +22,12 @@ import { MediaModule } from './media/media.module';
     BaseModule,
     InitModule,
     MediaModule,
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
   ],
 })
 export class AppModule {}

@@ -131,11 +131,14 @@ model PostCategory {
 
 model Media {
   id              Int      @id @default(autoincrement())
-  mimetype        String
-  destination     String
+  public_id       String
   filename        String
-  path            String
+  resource_type   String
+  format          String
   size            Int
+  width           Int
+  height          Int
+  url             String
   url_cdn         String?
   title           String?
   alt             String?

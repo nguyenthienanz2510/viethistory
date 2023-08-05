@@ -1,11 +1,15 @@
 import { IsOptional, IsString } from 'class-validator';
 
 export class InsertMediaDto {
-  mimetype: string;
-  destination: string;
   filename: string;
-  path: string;
+  public_id: string;
+  resource_type: string;
+  format: string;
+  destination?: string;
   size: number;
+  width: number;
+  height: number;
+  url: string;
 
   @IsOptional()
   @IsString()

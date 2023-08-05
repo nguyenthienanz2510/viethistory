@@ -1,15 +1,15 @@
 import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { InsertMediaDto, UpdateMediaDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
-import * as path from 'path';
-import * as fs from 'fs';
 import { BaseService } from '../base/base.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class MediaService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly baseService: BaseService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async getMedia() {
@@ -42,30 +42,78 @@ export class MediaService {
     );
   }
 
-  async uploadFiles(
+  async uploadSingleFile(
+    userId: string,
+    file: Express.Multer.File,
+    insertMediaDto: InsertMediaDto,
+  ) {
+    const cloudinaryResponse = await this.cloudinaryService.uploadFile(file);
+    try {
+      const media = await this.prismaService.media.create({
+        data: {
+          ...insertMediaDto,
+          filename: `${cloudinaryResponse.public_id}.${cloudinaryResponse.format}`,
+          public_id: cloudinaryResponse.public_id,
+          resource_type: cloudinaryResponse.resource_type,
+          format: cloudinaryResponse.format,
+          size: cloudinaryResponse.bytes,
+          url: cloudinaryResponse.url,
+          width: cloudinaryResponse.width,
+          height: cloudinaryResponse.height,
+          status: insertMediaDto.status || 'publish',
+          user_created_id: userId,
+          user_updated_id: userId,
+        },
+      });
+
+      return this.baseService.generateSuccessResponse(
+        HttpStatus.OK,
+        'Media created successfully',
+        { media },
+      );
+    } catch (error) {
+      console.error(error);
+      throw new ForbiddenException(error);
+    }
+  }
+
+  async uploadMultipleFile(
     userId: string,
     files: Express.Multer.File[],
     insertMediaDto: InsertMediaDto,
   ) {
-    const mediaInsert = this.prismaService.$transaction(
-      files.map((file) =>
-        this.prismaService.media.create({
-          data: {
-            ...insertMediaDto,
-            mimetype: file.mimetype,
-            destination: file.destination,
-            filename: file.filename,
-            path: this.removePublicPrefix(file.path),
-            size: file.size,
-            status: insertMediaDto.status || 'publish',
-            user_created_id: userId,
-            user_updated_id: userId,
-          },
-        }),
-      ),
-    );
+    const cloudinaryResponses = await this.cloudinaryService.uploadFiles(files);
+    try {
+      const media = await this.prismaService.$transaction(
+        cloudinaryResponses.map((item) =>
+          this.prismaService.media.create({
+            data: {
+              ...insertMediaDto,
+              filename: `${item.public_id}.${item.format}`,
+              public_id: item.public_id,
+              resource_type: item.resource_type,
+              format: item.format,
+              size: item.bytes,
+              url: item.url,
+              width: item.width,
+              height: item.height,
+              status: insertMediaDto.status || 'publish',
+              user_created_id: userId,
+              user_updated_id: userId,
+            },
+          }),
+        ),
+      );
 
-    return mediaInsert;
+      return this.baseService.generateSuccessResponse(
+        HttpStatus.OK,
+        'Media created successfully',
+        { media },
+      );
+    } catch (error) {
+      console.error(error);
+      throw new ForbiddenException(error);
+    }
   }
 
   async updateMedia(
@@ -73,48 +121,44 @@ export class MediaService {
     mediaId: number,
     updateMediaDto: UpdateMediaDto,
   ) {
-    await this.checkMediaExist(mediaId);
-    const media = await this.prismaService.media.update({
-      where: { id: mediaId },
-      data: { ...updateMediaDto, user_updated_id: userId },
-    });
-    return this.baseService.generateSuccessResponse(
-      HttpStatus.OK,
-      'Media updated successfully',
-      { media },
-    );
+    try {
+      await this.checkMediaExist(mediaId);
+      const media = await this.prismaService.media.update({
+        where: { id: mediaId },
+        data: { ...updateMediaDto, user_updated_id: userId },
+      });
+      return this.baseService.generateSuccessResponse(
+        HttpStatus.OK,
+        'Media updated successfully',
+        { media },
+      );
+    } catch (error) {
+      console.error(error);
+      throw new ForbiddenException(error);
+    }
   }
 
   async deleteMedia(userId: string, mediaId: number) {
     await this.checkMediaExist(mediaId);
 
-    const media = await this.prismaService.media.delete({
-      where: {
-        id: mediaId,
-      },
-    });
-    const filePath = path.join(
-      __dirname,
-      '..',
-      '..',
-      'public',
-      'uploads',
-      media.filename,
-    );
-    fs.unlinkSync(filePath);
-    return this.baseService.generateSuccessResponse(
-      HttpStatus.OK,
-      'File deleted successfully',
-      { media },
-    );
-  }
+    try {
+      const result = await this.prismaService.media.delete({
+        where: {
+          id: mediaId,
+        },
+      });
 
-  private removePublicPrefix(filePath: string): string {
-    const publicPrefix = 'public/';
-    if (filePath.startsWith(publicPrefix)) {
-      return filePath.substring(publicPrefix.length);
+      await this.cloudinaryService.deleteFile(result.public_id);
+
+      return this.baseService.generateSuccessResponse(
+        HttpStatus.OK,
+        'Media deleted successfully',
+        { result },
+      );
+    } catch (error) {
+      console.error(error);
+      throw new ForbiddenException(error);
     }
-    return filePath;
   }
 
   private async checkMediaExist(mediaId: number) {

@@ -104,24 +104,24 @@ export class AuthService {
     return tokens;
   }
 
-  async convertObjectToJwtString(
-    userId: string,
-    email: string,
-  ): Promise<{ accessToken: string }> {
-    const payload = {
-      sub: userId,
-      email: email,
-    };
+  // async convertObjectToJwtString(
+  //   userId: string,
+  //   email: string,
+  // ): Promise<{ accessToken: string }> {
+  //   const payload = {
+  //     sub: userId,
+  //     email: email,
+  //   };
 
-    const jwtString = await this.jwtService.signAsync(payload, {
-      expiresIn: '1m',
-      secret: this.configService.get('JWT_ACCESS_SECRET'),
-    });
+  //   const jwtString = await this.jwtService.signAsync(payload, {
+  //     expiresIn: '1m',
+  //     secret: this.configService.get('JWT_ACCESS_SECRET'),
+  //   });
 
-    return {
-      accessToken: jwtString,
-    };
-  }
+  //   return {
+  //     accessToken: jwtString,
+  //   };
+  // }
 
   hashData(data: string) {
     return argon.hash(data);
@@ -148,7 +148,7 @@ export class AuthService {
         },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-          expiresIn: '10m',
+          expiresIn: '1m',
         },
       ),
       this.jwtService.signAsync(
@@ -158,7 +158,7 @@ export class AuthService {
         },
         {
           secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-          expiresIn: '30d',
+          expiresIn: '5m',
         },
       ),
     ]);

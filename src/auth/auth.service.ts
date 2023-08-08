@@ -2,12 +2,14 @@ import { ConfigService } from '@nestjs/config';
 import {
   BadRequestException,
   ForbiddenException,
+  HttpStatus,
   Injectable,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as argon from 'argon2';
 import { InsertUserDto, AuthDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
+import { BaseService } from '../base/base.service';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly baseService: BaseService,
   ) {}
   async register(userDto: InsertUserDto) {
     const userExists = await this.prismaService.user.findUnique({
@@ -38,16 +41,22 @@ export class AuthService {
 
       const tokens = await this.getTokens(user.id, user.email);
       await this.updateRefreshToken(user.id, tokens.refreshToken);
-      return tokens;
+
+      return this.baseService.generateSuccessResponse(
+        HttpStatus.CREATED,
+        'Register successfully',
+        { tokens },
+      );
     } catch (error) {
       if (error.code === 'P2002') {
         throw new ForbiddenException(
           `Unique constraint failed on the ${error.meta.target}`,
         );
       }
-      return {
-        error: error,
-      };
+      return this.baseService.generateErrorResponse(
+        HttpStatus.BAD_REQUEST,
+        'Register failed',
+      );
     }
   }
 
@@ -70,17 +79,25 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
-    return tokens;
+    return this.baseService.generateSuccessResponse(
+      HttpStatus.CREATED,
+      'Login successfully',
+      { tokens },
+    );
   }
 
   async logout(userId: string) {
-    await this.prismaService.user.update({
+    const user = await this.prismaService.user.update({
       where: { id: userId },
       data: { refresh_token: null },
     });
-    return {
-      message: 'Logout successfully',
-    };
+    return this.baseService.generateSuccessResponse(
+      HttpStatus.OK,
+      'Logout successfully',
+      {
+        user,
+      },
+    );
   }
 
   async refreshTokens(userId: string, refreshToken: string) {
@@ -101,7 +118,11 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.username);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    return tokens;
+    return this.baseService.generateSuccessResponse(
+      HttpStatus.OK,
+      'Refresh Tokens successfully',
+      { tokens },
+    );
   }
 
   // async convertObjectToJwtString(

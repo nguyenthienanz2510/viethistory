@@ -107,8 +107,8 @@ describe('APP ENDTOEND TEST', () => {
             password: 'umap12345',
           })
           .expectStatus(201)
-          .stores('accessToken', 'accessToken')
-          .stores('refreshToken', 'refreshToken');
+          .stores('accessToken', 'access_token')
+          .stores('refreshToken', 'refresh_token');
       });
 
       it('should error when email not found', () => {

@@ -39,13 +39,16 @@ export class AuthService {
         },
       });
 
+      delete user.password;
+      delete user.refresh_token;
+
       const tokens = await this.getTokens(user.id, user.email);
-      await this.updateRefreshToken(user.id, tokens.refreshToken);
+      await this.updateRefreshToken(user.id, tokens.refresh_token);
 
       return this.baseService.generateSuccessResponse(
         HttpStatus.CREATED,
         'Register successfully',
-        { tokens },
+        { tokens, profile: user },
       );
     } catch (error) {
       if (error.code === 'P2002') {
@@ -78,11 +81,15 @@ export class AuthService {
     }
 
     const tokens = await this.getTokens(user.id, user.email);
-    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+    delete user.password;
+    delete user.refresh_token;
+  
     return this.baseService.generateSuccessResponse(
       HttpStatus.CREATED,
       'Login successfully',
-      { tokens },
+      { tokens, profile: user },
     );
   }
 
@@ -91,11 +98,15 @@ export class AuthService {
       where: { id: userId },
       data: { refresh_token: null },
     });
+
+    delete user.password;
+    delete user.refresh_token;
+
     return this.baseService.generateSuccessResponse(
       HttpStatus.OK,
       'Logout successfully',
       {
-        user,
+        profile: user,
       },
     );
   }
@@ -116,33 +127,17 @@ export class AuthService {
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
 
     const tokens = await this.getTokens(user.id, user.username);
-    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+    delete user.password;
+    delete user.refresh_token;
 
     return this.baseService.generateSuccessResponse(
-      HttpStatus.OK,
+      HttpStatus.CREATED,
       'Refresh Tokens successfully',
-      { tokens },
+      { tokens, profile: user },
     );
   }
-
-  // async convertObjectToJwtString(
-  //   userId: string,
-  //   email: string,
-  // ): Promise<{ accessToken: string }> {
-  //   const payload = {
-  //     sub: userId,
-  //     email: email,
-  //   };
-
-  //   const jwtString = await this.jwtService.signAsync(payload, {
-  //     expiresIn: '1m',
-  //     secret: this.configService.get('JWT_ACCESS_SECRET'),
-  //   });
-
-  //   return {
-  //     accessToken: jwtString,
-  //   };
-  // }
 
   hashData(data: string) {
     return argon.hash(data);
@@ -161,7 +156,7 @@ export class AuthService {
   }
 
   async getTokens(userId: string, email: string) {
-    const [accessToken, refreshToken] = await Promise.all([
+    const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
@@ -185,8 +180,8 @@ export class AuthService {
     ]);
 
     return {
-      accessToken,
-      refreshToken,
+      access_token,
+      refresh_token,
     };
   }
 }

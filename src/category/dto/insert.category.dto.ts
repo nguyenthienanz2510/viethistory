@@ -41,6 +41,10 @@ export class InsertCategoryDto {
 
   @IsOptional()
   @IsNumber()
+  is_featured?: boolean;
+
+  @IsOptional()
+  @IsNumber()
   order?: number;
 
   @IsOptional()
@@ -52,11 +56,6 @@ export class InsertCategoryDto {
   @IsString()
   @MaxLength(255)
   meta_description?;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  meta_keywords?;
 
   user_created_id: string;
 

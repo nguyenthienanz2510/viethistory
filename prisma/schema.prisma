@@ -2,12 +2,29 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Role {
+  id   Int    @id @unique @default(autoincrement())
+  name String @unique
+  User User[]
+
+  @@map("vh_roles")
+}
+
+model UserStatus {
+  id   Int    @id @unique @default(autoincrement())
+  name String @unique
+  User User[]
+
+  @@map("vh_user_status")
 }
 
 model User {
@@ -28,29 +45,29 @@ model User {
   role_name          Role       @relation(fields: [role], references: [name])
   status_name        UserStatus @relation(fields: [status], references: [name])
   posts              Post[]     @relation("user")
-  posts_updated      Post[]     @relation("user_update")
+  posts_updated      Post[]     @relation("user_updated")
   media              Media[]    @relation("user")
-  media_updated      Media[]    @relation("user_update")
+  media_updated      Media[]    @relation("user_updated")
   categories         Category[] @relation("user")
-  categories_updated Category[] @relation("user_update")
+  categories_updated Category[] @relation("user_updated")
 
   @@map("vh_users")
 }
 
-model Role {
-  id   Int    @id @unique @default(autoincrement())
-  name String @unique
-  User User[]
+model Languages {
+  id            Int     @id @unique @default(autoincrement())
+  ietf_tag      String
+  language_code String  @unique
+  country_code  String
+  language      String
+  country       String
+  is_active     Boolean
 
-  @@map("vh_roles")
-}
+  posts_translations      PostTranslations[]
+  categories_translations CategoryTranslations[]
+  media_translations      MediaTranslations[]
 
-model UserStatus {
-  id   Int    @id @unique @default(autoincrement())
-  name String @unique
-  User User[]
-
-  @@map("vh_user_status")
+  @@map("vh_languages")
 }
 
 model Post {
@@ -63,21 +80,38 @@ model Post {
   images           String?
   content          String
   timestamp        DateTime
+  is_featured      Boolean?
   order            Int?
   meta_title       String?
   meta_description String?
-  meta_keywords    String?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
   user_created_id  String
   user_updated_id  String
 
-  status_name   Status         @relation(fields: [status], references: [name])
-  user_updated  User           @relation("user_update", fields: [user_updated_id], references: [id])
-  user_created  User           @relation("user", fields: [user_created_id], references: [id])
+  status_name   Status             @relation(fields: [status], references: [name])
+  user_updated  User               @relation("user_updated", fields: [user_updated_id], references: [id])
+  user_created  User               @relation("user", fields: [user_created_id], references: [id])
   post_category PostCategory[]
+  translations  PostTranslations[]
 
   @@map("vh_posts")
+}
+
+model PostTranslations {
+  id               Int     @id @default(autoincrement())
+  post_id          Int
+  language_code    String
+  title            String?
+  description      String?
+  content          String?
+  meta_title       String?
+  meta_description String?
+
+  post        Post      @relation(fields: [post_id], references: [id])
+  status_name Languages @relation(fields: [language_code], references: [language_code])
+
+  @@map("vh_posts_translations")
 }
 
 model Category {
@@ -89,22 +123,38 @@ model Category {
   status           String
   thumb            Int?
   images           String?
+  is_featured      Boolean?
   order            Int?
   meta_title       String?
   meta_description String?
-  meta_keywords    String?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
   user_created_id  String
   user_updated_id  String
 
   status_name  Status @relation(fields: [status], references: [name])
-  user_updated User   @relation("user_update", fields: [user_updated_id], references: [id])
+  user_updated User   @relation("user_updated", fields: [user_updated_id], references: [id])
   user_created User   @relation("user", fields: [user_created_id], references: [id])
 
   post_category PostCategory[]
+  translations  CategoryTranslations[]
 
   @@map("vh_categories")
+}
+
+model CategoryTranslations {
+  id               Int     @id @default(autoincrement())
+  category_id      Int
+  language_code    String
+  name             String?
+  description      String?
+  meta_title       String?
+  meta_description String?
+
+  category    Category  @relation(fields: [category_id], references: [id])
+  status_name Languages @relation(fields: [language_code], references: [language_code])
+
+  @@map("vh_categories_translations")
 }
 
 model Status {
@@ -149,9 +199,24 @@ model Media {
   user_created_id String
   user_updated_id String
 
-  status_name  Status @relation(fields: [status], references: [name])
-  user_updated User   @relation("user_update", fields: [user_updated_id], references: [id])
-  user_created User   @relation("user", fields: [user_created_id], references: [id])
+  status_name  Status              @relation(fields: [status], references: [name])
+  user_updated User                @relation("user_updated", fields: [user_updated_id], references: [id])
+  user_created User                @relation("user", fields: [user_created_id], references: [id])
+  translations MediaTranslations[]
 
   @@map("vh_media")
+}
+
+model MediaTranslations {
+  id            Int     @id @default(autoincrement())
+  media_id      Int
+  language_code String
+  title         String?
+  alt           String?
+  description   String?
+
+  media       Media     @relation(fields: [media_id], references: [id])
+  status_name Languages @relation(fields: [language_code], references: [language_code])
+
+  @@map("vh_media_translations")
 }

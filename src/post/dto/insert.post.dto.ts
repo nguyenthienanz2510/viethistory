@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsDateString,
@@ -46,6 +47,10 @@ export class InsertPostDto {
 
   @IsOptional()
   @IsNumber()
+  is_featured?: boolean;
+
+  @IsOptional()
+  @IsNumber()
   order?: number;
 
   @IsOptional()
@@ -58,12 +63,37 @@ export class InsertPostDto {
   @MaxLength(255)
   meta_description?: string;
 
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  meta_keywords?: string;
-
   user_created_id: string;
 
   user_updated_id: string;
+
+  @IsArray()
+  @Type(() => PostTranslations)
+  translations: PostTranslations[];
+}
+
+class PostTranslations {
+  @IsNotEmpty()
+  @IsString()
+  language_code: string;
+
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  content?: string;
+
+  @IsOptional()
+  @IsString()
+  meta_title?: string;
+
+  @IsOptional()
+  @IsString()
+  meta_description?: string;
 }

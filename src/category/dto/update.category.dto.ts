@@ -40,6 +40,10 @@ export class UpdateCategoryDto {
 
   @IsOptional()
   @IsNumber()
+  is_featured?: boolean;
+
+  @IsOptional()
+  @IsNumber()
   order?: number;
 
   @IsOptional()
@@ -51,11 +55,6 @@ export class UpdateCategoryDto {
   @IsString()
   @MaxLength(255)
   meta_description?;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  meta_keywords?;
 
   @IsOptional()
   @IsNumber()

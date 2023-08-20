@@ -15,6 +15,7 @@ export class PostService {
       include: {
         user_created: true,
         user_updated: true,
+        translations: true,
       },
     });
     return this.baseService.generateSuccessResponse(
@@ -31,6 +32,7 @@ export class PostService {
       include: {
         user_created: true,
         user_updated: true,
+        translations: true,
       },
     });
     return this.baseService.generateSuccessResponse(
@@ -52,6 +54,13 @@ export class PostService {
         user_updated_id: userId,
         slug,
         status: insertPostDto.status || 'publish',
+
+        translations: {
+          create: insertPostDto.translations,
+        },
+      },
+      include: {
+        translations: true,
       },
     });
     return this.baseService.generateSuccessResponse(
@@ -66,15 +75,66 @@ export class PostService {
     postId: number,
     updatePostDto: UpdatePostDto,
   ) {
-    await this.checkPostExist(postId);
-    const post = await this.prismaService.post.update({
-      where: { id: postId },
-      data: { ...updatePostDto, user_updated_id: userId },
+    const post = await this.checkPostExist(postId);
+  
+    const translationCreates = [];
+    const translationUpdates = [];
+  
+    for (const translationDto of updatePostDto.translations) {
+      const existingTranslation = post.translations.find(
+        (t) => t.language_code === translationDto.language_code
+      );
+  
+      if (existingTranslation) {
+        translationUpdates.push({
+          where: {
+            id: existingTranslation.id,
+          },
+          data: {
+            title: translationDto.title,
+            description: translationDto.description,
+            content: translationDto.content,
+            meta_title: translationDto.meta_title,
+            meta_description: translationDto.meta_description,
+          },
+        });
+      } else {
+        translationCreates.push({
+          post_id: postId,
+          language_code: translationDto.language_code,
+          title: translationDto.title,
+          description: translationDto.description,
+          content: translationDto.content,
+          meta_title: translationDto.meta_title,
+          meta_description: translationDto.meta_description,
+        });
+      }
+    }
+  
+    await this.prismaService.postTranslations.createMany({
+      data: translationCreates,
     });
+  
+    const updatedPost = await this.prismaService.post.update({
+      where: { id: postId },
+      data: {
+        ...updatePostDto,
+        user_updated_id: userId,
+        translations: {
+          updateMany: translationUpdates,
+        },
+      },
+      include: {
+        user_created: true,
+        user_updated: true,
+        translations: true,
+      },
+    });
+  
     return this.baseService.generateSuccessResponse(
       HttpStatus.OK,
       'Post updated successfully',
-      { post },
+      { post: updatedPost },
     );
   }
 
@@ -93,9 +153,13 @@ export class PostService {
   private async checkPostExist(postId: number) {
     const post = await this.prismaService.post.findUnique({
       where: { id: postId },
+      include: {
+        translations: true,
+      },
     });
     if (!post) {
       throw new ForbiddenException('Post not found');
     }
+    return post;
   }
 }

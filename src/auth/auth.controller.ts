@@ -33,5 +33,4 @@ export class AuthController {
     console.log(req)
     return this.authService.refreshTokens(userId, refreshToken);
   }
-
 }

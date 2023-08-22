@@ -30,7 +30,7 @@ export class UpdatePostDto {
   status?: string;
 
   @IsOptional()
-  @IsString()
+  @IsNumber()
   thumb?: number;
 
   @IsOptional()

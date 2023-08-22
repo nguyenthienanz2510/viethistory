@@ -30,7 +30,7 @@ export class InsertPostDto {
   status: string;
 
   @IsOptional()
-  @IsString()
+  @IsNumber()
   thumb?: number;
 
   @IsOptional()

@@ -32,7 +32,7 @@ export class InsertCategoryDto {
   status: string;
 
   @IsOptional()
-  @IsString()
+  @IsNumber()
   thumb?: number;
 
   @IsOptional()

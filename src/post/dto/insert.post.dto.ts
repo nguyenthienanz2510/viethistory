@@ -22,7 +22,7 @@ export class InsertPostDto {
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(255)
+  @MaxLength(500)
   description: string;
 
   @IsOptional()
@@ -67,6 +67,10 @@ export class InsertPostDto {
 
   user_updated_id: string;
 
+  @IsOptional()
+  @IsArray()
+  category_id?: number[];
+
   @IsArray()
   @Type(() => PostTranslations)
   translations: PostTranslations[];
@@ -79,10 +83,12 @@ class PostTranslations {
 
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   title?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   description?: string;
 
   @IsOptional()
@@ -91,9 +97,11 @@ class PostTranslations {
 
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   meta_title?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   meta_description?: string;
 }

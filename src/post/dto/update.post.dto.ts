@@ -67,6 +67,10 @@ export class UpdatePostDto {
 
   user_updated_id: string;
 
+  @IsOptional()
+  @IsArray()
+  category_id?: Array<number>;
+
   @IsArray()
   @Type(() => PostTranslations)
   translations: PostTranslations[];

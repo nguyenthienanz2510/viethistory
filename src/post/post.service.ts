@@ -47,6 +47,7 @@ export class PostService {
       insertPostDto.title,
       'post',
     );
+
     const post = await this.prismaService.post.create({
       data: {
         ...insertPostDto,
@@ -55,14 +56,22 @@ export class PostService {
         slug,
         status: insertPostDto.status || 'publish',
 
+        post_category: {
+          create: insertPostDto.category_id.map((categoryId) => ({
+            category_id: categoryId
+          })),
+        },
+
         translations: {
           create: insertPostDto.translations,
         },
       },
       include: {
         translations: true,
+        post_category: true,
       },
     });
+
     return this.baseService.generateSuccessResponse(
       HttpStatus.CREATED,
       'Post created successfully',
@@ -76,15 +85,15 @@ export class PostService {
     updatePostDto: UpdatePostDto,
   ) {
     const post = await this.checkPostExist(postId);
-  
+
     const translationCreates = [];
     const translationUpdates = [];
-  
+
     for (const translationDto of updatePostDto.translations) {
       const existingTranslation = post.translations.find(
-        (t) => t.language_code === translationDto.language_code
+        (t) => t.language_code === translationDto.language_code,
       );
-  
+
       if (existingTranslation) {
         translationUpdates.push({
           where: {
@@ -120,6 +129,13 @@ export class PostService {
       data: {
         ...updatePostDto,
         user_updated_id: userId,
+
+        post_category: {
+          create: updatePostDto.category_id.map((categoryId) => ({
+            category_id: categoryId,
+          })),
+        },
+
         translations: {
           updateMany: translationUpdates,
         },
@@ -130,7 +146,7 @@ export class PostService {
         translations: true,
       },
     });
-  
+
     return this.baseService.generateSuccessResponse(
       HttpStatus.OK,
       'Post updated successfully',
@@ -142,6 +158,9 @@ export class PostService {
     await this.checkPostExist(postId);
     const post = await this.prismaService.post.delete({
       where: { id: postId },
+      include: {
+        translations: true,
+      },
     });
     return this.baseService.generateSuccessResponse(
       HttpStatus.OK,

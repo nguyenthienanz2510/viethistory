@@ -108,7 +108,7 @@ model PostTranslations {
   meta_title       String?
   meta_description String?
 
-  post        Post      @relation(fields: [post_id], references: [id])
+  post        Post      @relation(fields: [post_id], references: [id], onDelete: Cascade)
   status_name Languages @relation(fields: [language_code], references: [language_code])
 
   @@map("vh_posts_translations")
@@ -151,7 +151,7 @@ model CategoryTranslations {
   meta_title       String?
   meta_description String?
 
-  category    Category  @relation(fields: [category_id], references: [id])
+  category    Category  @relation(fields: [category_id], references: [id], onDelete: Cascade)
   status_name Languages @relation(fields: [language_code], references: [language_code])
 
   @@map("vh_categories_translations")
@@ -173,8 +173,8 @@ model PostCategory {
   post_id     Int
   category_id Int
 
-  post     Post     @relation(fields: [post_id], references: [id])
-  category Category @relation(fields: [category_id], references: [id])
+  post     Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
 
   @@map("vh_post_category")
 }
@@ -215,7 +215,7 @@ model MediaTranslations {
   alt           String?
   description   String?
 
-  media       Media     @relation(fields: [media_id], references: [id])
+  media       Media     @relation(fields: [media_id], references: [id], onDelete: Cascade)
   status_name Languages @relation(fields: [language_code], references: [language_code])
 
   @@map("vh_media_translations")

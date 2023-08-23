@@ -48,6 +48,18 @@ export class PostService {
       'post',
     );
 
+    const categories = insertPostDto.categories.length
+      ? insertPostDto.categories.map((categoryId) => ({
+          category: {
+            connect: {
+              id: categoryId,
+            },
+          },
+        }))
+      : [];
+
+    delete insertPostDto.categories;
+
     const post = await this.prismaService.post.create({
       data: {
         ...insertPostDto,
@@ -56,10 +68,8 @@ export class PostService {
         slug,
         status: insertPostDto.status || 'publish',
 
-        post_category: {
-          create: insertPostDto.category_id.map((categoryId) => ({
-            category_id: categoryId
-          })),
+        categories: {
+          create: categories,
         },
 
         translations: {
@@ -68,7 +78,11 @@ export class PostService {
       },
       include: {
         translations: true,
-        post_category: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
     });
 
@@ -119,21 +133,54 @@ export class PostService {
         });
       }
     }
-  
+
     await this.prismaService.postTranslations.createMany({
       data: translationCreates,
     });
-  
+
+    const categoryCreates = [];
+    const categoryDeletes = [];
+
+    if (updatePostDto.categories && updatePostDto.categories.length > 0) {
+      for (const categoryId of updatePostDto.categories) {
+        const existingCategory = post.categories.find(
+          (category) => category.category_id === categoryId,
+        );
+
+        if (!existingCategory) {
+          categoryCreates.push({
+            category: {
+              connect: {
+                id: categoryId,
+              },
+            },
+          });
+        }
+      }
+
+      for (const category of post.categories) {
+        if (!updatePostDto.categories.includes(category.category_id)) {
+          categoryDeletes.push({
+            post_id_category_id: {
+              post_id: post.id,
+              category_id: category.category_id,
+            },
+          });
+        }
+      }
+    }
+
+    delete updatePostDto.categories;
+
     const updatedPost = await this.prismaService.post.update({
       where: { id: postId },
       data: {
         ...updatePostDto,
         user_updated_id: userId,
 
-        post_category: {
-          create: updatePostDto.category_id.map((categoryId) => ({
-            category_id: categoryId,
-          })),
+        categories: {
+          delete: categoryDeletes,
+          create: categoryCreates,
         },
 
         translations: {
@@ -144,6 +191,11 @@ export class PostService {
         user_created: true,
         user_updated: true,
         translations: true,
+        categories: {
+          include: {
+            category: true
+          }
+        }
       },
     });
 
@@ -174,6 +226,7 @@ export class PostService {
       where: { id: postId },
       include: {
         translations: true,
+        categories: true,
       },
     });
     if (!post) {

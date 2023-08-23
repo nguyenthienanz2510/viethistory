@@ -69,7 +69,7 @@ export class UpdatePostDto {
 
   @IsOptional()
   @IsArray()
-  category_id?: Array<number>;
+  categories?: Array<number>;
 
   @IsArray()
   @Type(() => PostTranslations)

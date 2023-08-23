@@ -69,7 +69,7 @@ export class InsertPostDto {
 
   @IsOptional()
   @IsArray()
-  category_id?: number[];
+  categories?: number[];
 
   @IsArray()
   @Type(() => PostTranslations)

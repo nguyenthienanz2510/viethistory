@@ -92,7 +92,7 @@ model Post {
   status_name   Status             @relation(fields: [status], references: [name])
   user_updated  User               @relation("user_updated", fields: [user_updated_id], references: [id])
   user_created  User               @relation("user", fields: [user_created_id], references: [id])
-  post_category PostCategory[]
+  categories PostCategory[]
   translations  PostTranslations[]
 
   @@map("vh_posts")
@@ -136,7 +136,7 @@ model Category {
   user_updated User   @relation("user_updated", fields: [user_updated_id], references: [id])
   user_created User   @relation("user", fields: [user_created_id], references: [id])
 
-  post_category PostCategory[]
+  posts PostCategory[]
   translations  CategoryTranslations[]
 
   @@map("vh_categories")
@@ -169,7 +169,6 @@ model Status {
 }
 
 model PostCategory {
-  id          Int @id @default(autoincrement())
   post_id     Int
   category_id Int
 
@@ -177,6 +176,7 @@ model PostCategory {
   category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
 
   @@map("vh_post_category")
+  @@id([post_id, category_id])
 }
 
 model Media {

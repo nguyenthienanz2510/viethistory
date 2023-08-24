@@ -16,6 +16,7 @@ export class PostService {
         user_created: true,
         user_updated: true,
         translations: true,
+        thumb: true,
       },
     });
 
@@ -52,6 +53,7 @@ export class PostService {
         user_created: true,
         user_updated: true,
         translations: true,
+        thumb: true,
       },
     });
 

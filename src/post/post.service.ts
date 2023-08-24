@@ -22,7 +22,12 @@ export class PostService {
     const formattedPosts = posts.map((post) => {
       const translations = {};
       post.translations.forEach((translation) => {
-        translations[translation.language_code] = translation;
+        delete post.translations
+
+        translations[translation.language_code] = {
+          ...post,
+          ...translation,
+        };
       });
 
       return {
@@ -52,7 +57,12 @@ export class PostService {
 
     const translations = {};
     post.translations.forEach((translation) => {
-      translations[translation.language_code] = translation;
+      delete post.translations
+
+      translations[translation.language_code] = {
+        ...post,
+        ...translation,
+      };
     });
 
     const formattedPost = {

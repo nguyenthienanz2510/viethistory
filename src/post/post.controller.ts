@@ -21,9 +21,12 @@ export class PostController {
   @Get()
   getPosts(@Query('slug') slug: string) {
     const query = {
-      slug: slug
+      slug: slug,
+    };
+    if (query.slug) {
+      return this.postService.getPostBySlug(query);
     }
-    return this.postService.getPosts({ query });
+    return this.postService.getPosts();
   }
 
   @Get(':id')

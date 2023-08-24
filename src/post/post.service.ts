@@ -10,26 +10,7 @@ export class PostService {
     private readonly baseService: BaseService,
   ) {}
 
-  async getPosts({ query }: { query: { slug?: string } }) {
-    if (query.slug) {
-      const posts = await this.prismaService.post.findUnique({
-        where: {
-          slug: query.slug,
-        },
-        include: {
-          user_created: true,
-          user_updated: true,
-          translations: true,
-          thumb: true,
-        },
-      });
-
-      return this.baseService.generateSuccessResponse(
-        HttpStatus.OK,
-        'Posts fetched successfully',
-        { posts },
-      );
-    }
+  async getPosts() {
     const posts = await this.prismaService.post.findMany({
       include: {
         user_created: true,
@@ -61,6 +42,43 @@ export class PostService {
       'Posts fetched successfully',
       { posts: formattedPosts },
     );
+  }
+
+  async getPostBySlug({ slug }: { slug: string }) {
+    if (slug) {
+      const post = await this.prismaService.post.findUnique({
+        where: {
+          slug: slug,
+        },
+        include: {
+          user_created: true,
+          user_updated: true,
+          translations: true,
+          thumb: true,
+        },
+      });
+
+      const translations = {};
+      post.translations.forEach((translation) => {
+        delete post.translations;
+
+        translations[translation.language_code] = {
+          ...post,
+          ...translation,
+        };
+      });
+
+      const formattedPost = {
+        ...post,
+        translations,
+      };
+
+      return this.baseService.generateSuccessResponse(
+        HttpStatus.OK,
+        'Post fetched successfully',
+        { post: formattedPost },
+      );
+    }
   }
 
   async getPostById(postId: number) {

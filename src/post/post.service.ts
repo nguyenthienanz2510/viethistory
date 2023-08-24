@@ -10,7 +10,26 @@ export class PostService {
     private readonly baseService: BaseService,
   ) {}
 
-  async getPosts() {
+  async getPosts({ query }: { query: { slug?: string } }) {
+    if (query.slug) {
+      const posts = await this.prismaService.post.findUnique({
+        where: {
+          slug: query.slug,
+        },
+        include: {
+          user_created: true,
+          user_updated: true,
+          translations: true,
+          thumb: true,
+        },
+      });
+
+      return this.baseService.generateSuccessResponse(
+        HttpStatus.OK,
+        'Posts fetched successfully',
+        { posts },
+      );
+    }
     const posts = await this.prismaService.post.findMany({
       include: {
         user_created: true,
@@ -23,7 +42,7 @@ export class PostService {
     const formattedPosts = posts.map((post) => {
       const translations = {};
       post.translations.forEach((translation) => {
-        delete post.translations
+        delete post.translations;
 
         translations[translation.language_code] = {
           ...post,
@@ -59,7 +78,7 @@ export class PostService {
 
     const translations = {};
     post.translations.forEach((translation) => {
-      delete post.translations
+      delete post.translations;
 
       translations[translation.language_code] = {
         ...post,

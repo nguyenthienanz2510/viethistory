@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AccessJwtGuard } from '../auth/guard';
@@ -18,8 +19,11 @@ import { InsertPostDto, UpdatePostDto } from './dto';
 export class PostController {
   constructor(private readonly postService: PostService) {}
   @Get()
-  getPosts() {
-    return this.postService.getPosts();
+  getPosts(@Query('slug') slug: string) {
+    const query = {
+      slug: slug
+    }
+    return this.postService.getPosts({ query });
   }
 
   @Get(':id')

@@ -33,7 +33,7 @@ export class InsertCategoryDto {
 
   @IsOptional()
   @IsNumber()
-  thumb?: number;
+  thumb_id?: number;
 
   @IsOptional()
   @IsArray()

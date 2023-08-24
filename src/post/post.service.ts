@@ -18,15 +18,29 @@ export class PostService {
         translations: true,
       },
     });
+
+    const formattedPosts = posts.map((post) => {
+      const translations = {};
+      post.translations.forEach((translation) => {
+        translations[translation.language_code] = translation;
+      });
+
+      return {
+        ...post,
+        translations,
+      };
+    });
+
     return this.baseService.generateSuccessResponse(
       HttpStatus.OK,
       'Posts fetched successfully',
-      { posts },
+      { posts: formattedPosts },
     );
   }
 
   async getPostById(postId: number) {
     await this.checkPostExist(postId);
+
     const post = await this.prismaService.post.findUnique({
       where: { id: postId },
       include: {
@@ -35,10 +49,21 @@ export class PostService {
         translations: true,
       },
     });
+
+    const translations = {};
+    post.translations.forEach((translation) => {
+      translations[translation.language_code] = translation;
+    });
+
+    const formattedPost = {
+      ...post,
+      translations,
+    };
+
     return this.baseService.generateSuccessResponse(
       HttpStatus.OK,
       'Post fetched successfully',
-      { post },
+      { post: formattedPost },
     );
   }
 
@@ -193,9 +218,9 @@ export class PostService {
         translations: true,
         categories: {
           include: {
-            category: true
-          }
-        }
+            category: true,
+          },
+        },
       },
     });
 

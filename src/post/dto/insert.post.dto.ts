@@ -31,7 +31,7 @@ export class InsertPostDto {
 
   @IsOptional()
   @IsNumber()
-  thumb?: number;
+  thumb_id?: number;
 
   @IsOptional()
   @IsArray()

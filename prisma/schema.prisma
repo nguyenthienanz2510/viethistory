@@ -76,7 +76,8 @@ model Post {
   slug             String?  @unique
   description      String
   status           String
-  thumb            Int?
+  thumb_id         Int?
+  thumb            Media?   @relation("post_thumb", fields: [thumb_id], references: [id])
   images           String?
   content          String
   timestamp        DateTime
@@ -89,11 +90,11 @@ model Post {
   user_created_id  String
   user_updated_id  String
 
-  status_name   Status             @relation(fields: [status], references: [name])
-  user_updated  User               @relation("user_updated", fields: [user_updated_id], references: [id])
-  user_created  User               @relation("user", fields: [user_created_id], references: [id])
-  categories PostCategory[]
-  translations  PostTranslations[]
+  status_name  Status             @relation(fields: [status], references: [name])
+  user_updated User               @relation("user_updated", fields: [user_updated_id], references: [id])
+  user_created User               @relation("user", fields: [user_created_id], references: [id])
+  categories   PostCategory[]
+  translations PostTranslations[]
 
   @@map("vh_posts")
 }
@@ -121,7 +122,8 @@ model Category {
   slug             String?  @unique
   description      String?
   status           String
-  thumb            Int?
+  thumb_id         Int?
+  thumb            Media?   @relation("category_thumb", fields: [thumb_id], references: [id])
   images           String?
   is_featured      Boolean?
   order            Int?
@@ -136,8 +138,8 @@ model Category {
   user_updated User   @relation("user_updated", fields: [user_updated_id], references: [id])
   user_created User   @relation("user", fields: [user_created_id], references: [id])
 
-  posts PostCategory[]
-  translations  CategoryTranslations[]
+  posts        PostCategory[]
+  translations CategoryTranslations[]
 
   @@map("vh_categories")
 }
@@ -175,8 +177,8 @@ model PostCategory {
   post     Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
   category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
 
-  @@map("vh_post_category")
   @@id([post_id, category_id])
+  @@map("vh_post_category")
 }
 
 model Media {
@@ -203,6 +205,8 @@ model Media {
   user_updated User                @relation("user_updated", fields: [user_updated_id], references: [id])
   user_created User                @relation("user", fields: [user_created_id], references: [id])
   translations MediaTranslations[]
+  posts        Post[]              @relation("post_thumb")
+  categories   Category[]          @relation("category_thumb")
 
   @@map("vh_media")
 }

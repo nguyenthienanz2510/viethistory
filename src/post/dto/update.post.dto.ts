@@ -31,7 +31,7 @@ export class UpdatePostDto {
 
   @IsOptional()
   @IsNumber()
-  thumb?: number;
+  thumb_id?: number;
 
   @IsOptional()
   @IsArray()

@@ -32,7 +32,7 @@ export class UpdateCategoryDto {
 
   @IsOptional()
   @IsNumber()
-  thumb?: number;
+  thumb_id?: number;
 
   @IsOptional()
   @IsArray()

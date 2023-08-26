@@ -1,9 +1,9 @@
+import { Status } from '@prisma/client';
 import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateMediaDto {
   @IsOptional()
-  @IsString()
-  status?: string;
+  status?: Status;
 
   @IsOptional()
   @IsString()

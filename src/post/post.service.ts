@@ -140,7 +140,6 @@ export class PostService {
         user_created_id: userId,
         user_updated_id: userId,
         slug,
-        status: insertPostDto.status || 'publish',
 
         categories: {
           create: categories,

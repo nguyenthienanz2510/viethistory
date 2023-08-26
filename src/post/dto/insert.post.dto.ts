@@ -1,3 +1,4 @@
+import { Status } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -26,8 +27,7 @@ export class InsertPostDto {
   description: string;
 
   @IsOptional()
-  @IsString()
-  status: string;
+  status: Status;
 
   @IsOptional()
   @IsNumber()

@@ -1,3 +1,4 @@
+import { Role, UserStatus } from '@prisma/client';
 import {
   IsEmail,
   IsNotEmpty,
@@ -29,12 +30,10 @@ export class InsertUserDto {
   phone_number: string;
 
   @IsOptional()
-  @IsString()
-  status: string;
+  status: UserStatus;
 
   @IsOptional()
-  @IsString()
-  role: string;
+  role: Role;
 
   @IsOptional()
   @IsString()

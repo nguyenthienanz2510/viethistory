@@ -1,3 +1,4 @@
+import { Status } from '@prisma/client';
 import {
   IsArray,
   IsNotEmpty,
@@ -28,8 +29,7 @@ export class InsertCategoryDto {
   description?: string;
 
   @IsOptional()
-  @IsString()
-  status: string;
+  status: Status;
 
   @IsOptional()
   @IsNumber()

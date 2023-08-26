@@ -1,3 +1,4 @@
+import { Status } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -22,12 +23,11 @@ export class UpdatePostDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(255)
+  @MaxLength(500)
   description?: string;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  status?: Status;
 
   @IsOptional()
   @IsNumber()

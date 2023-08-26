@@ -11,39 +11,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Role {
-  id   Int    @id @unique @default(autoincrement())
-  name String @unique
-  User User[]
-
-  @@map("vh_roles")
+enum Role {
+  subscriber
+  author
+  editor
+  manager
+  admin
 }
 
-model UserStatus {
-  id   Int    @id @unique @default(autoincrement())
-  name String @unique
-  User User[]
+enum UserStatus {
+  active
+  inactive
+  locked
+  deleted
+}
 
-  @@map("vh_user_status")
+enum Status {
+  draft
+  publish
+  private
 }
 
 model User {
-  id            String   @id @unique @default(cuid())
-  email         String   @unique
+  id            String     @id @unique @default(cuid())
+  email         String     @unique
   password      String
   refresh_token String?
-  username      String   @unique
+  username      String     @unique
   phone_number  String?
-  role          String
-  status        String
+  role          Role       @default(subscriber)
+  status        UserStatus @default(active)
   first_name    String?
   last_name     String?
   avatar        String?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 
-  role_name          Role       @relation(fields: [role], references: [name])
-  status_name        UserStatus @relation(fields: [status], references: [name])
   posts              Post[]     @relation("user")
   posts_updated      Post[]     @relation("user_updated")
   media              Media[]    @relation("user")
@@ -75,7 +78,7 @@ model Post {
   title            String
   slug             String?  @unique
   description      String
-  status           String
+  status           Status   @default(publish)
   thumb_id         Int?
   thumb            Media?   @relation("post_thumb", fields: [thumb_id], references: [id])
   images           String?
@@ -90,7 +93,6 @@ model Post {
   user_created_id  String
   user_updated_id  String
 
-  status_name  Status             @relation(fields: [status], references: [name])
   user_updated User               @relation("user_updated", fields: [user_updated_id], references: [id])
   user_created User               @relation("user", fields: [user_created_id], references: [id])
   categories   PostCategory[]
@@ -121,7 +123,7 @@ model Category {
   name             String
   slug             String?  @unique
   description      String?
-  status           String
+  status           Status   @default(publish)
   thumb_id         Int?
   thumb            Media?   @relation("category_thumb", fields: [thumb_id], references: [id])
   images           String?
@@ -134,9 +136,8 @@ model Category {
   user_created_id  String
   user_updated_id  String
 
-  status_name  Status @relation(fields: [status], references: [name])
-  user_updated User   @relation("user_updated", fields: [user_updated_id], references: [id])
-  user_created User   @relation("user", fields: [user_created_id], references: [id])
+  user_updated User @relation("user_updated", fields: [user_updated_id], references: [id])
+  user_created User @relation("user", fields: [user_created_id], references: [id])
 
   posts        PostCategory[]
   translations CategoryTranslations[]
@@ -157,17 +158,6 @@ model CategoryTranslations {
   status_name Languages @relation(fields: [language_code], references: [language_code])
 
   @@map("vh_categories_translations")
-}
-
-model Status {
-  id   Int    @id @unique @default(autoincrement())
-  name String @unique
-
-  Post     Post[]
-  Category Category[]
-  Media    Media[]
-
-  @@map("vh_status")
 }
 
 model PostCategory {
@@ -195,13 +185,12 @@ model Media {
   title           String?
   alt             String?
   description     String?
-  status          String
+  status          Status   @default(publish)
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
   user_created_id String
   user_updated_id String
 
-  status_name  Status              @relation(fields: [status], references: [name])
   user_updated User                @relation("user_updated", fields: [user_updated_id], references: [id])
   user_created User                @relation("user", fields: [user_created_id], references: [id])
   translations MediaTranslations[]

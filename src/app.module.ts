@@ -6,7 +6,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { CategoryModule } from './category/category.module';
 import { BaseModule } from './base/base.module';
-import { InitModule } from './init/init.module';
 import { MediaModule } from './media/media.module';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './http-exception.filter';
@@ -20,7 +19,6 @@ import { HttpExceptionFilter } from './http-exception.filter';
     PostModule,
     CategoryModule,
     BaseModule,
-    InitModule,
     MediaModule,
   ],
   providers: [

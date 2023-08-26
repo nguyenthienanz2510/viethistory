@@ -41,9 +41,10 @@ model User {
   phone_number  String?
   role          Role       @default(subscriber)
   status        UserStatus @default(active)
-  first_name    String?
-  last_name     String?
-  avatar        String?
+  first_name    String
+  last_name     String
+  avatar_id     Int?
+  avatar        Media?     @relation("avatar", fields: [avatar_id], references: [id])
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
 
@@ -66,9 +67,9 @@ model Languages {
   country       String
   is_active     Boolean
 
-  posts_translations      PostTranslations[]
-  categories_translations CategoryTranslations[]
-  media_translations      MediaTranslations[]
+  posts_translations      PostTranslations[]     @relation("posts_language_translation")
+  categories_translations CategoryTranslations[] @relation("categories_language_translation")
+  media_translations      MediaTranslations[]    @relation("media_language_translation")
 
   @@map("vh_languages")
 }
@@ -88,31 +89,32 @@ model Post {
   order            Int?
   meta_title       String?
   meta_description String?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
-  user_created_id  String
-  user_updated_id  String
 
-  user_updated User               @relation("user_updated", fields: [user_updated_id], references: [id])
-  user_created User               @relation("user", fields: [user_created_id], references: [id])
-  categories   PostCategory[]
-  translations PostTranslations[]
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  user_created_id String
+  user_created    User     @relation("user", fields: [user_created_id], references: [id])
+  user_updated_id String
+  user_updated    User     @relation("user_updated", fields: [user_updated_id], references: [id])
+
+  categories   PostCategory[]     @relation("post")
+  translations PostTranslations[] @relation("post_translations")
 
   @@map("vh_posts")
 }
 
 model PostTranslations {
-  id               Int     @id @default(autoincrement())
+  id               Int       @id @default(autoincrement())
   post_id          Int
   language_code    String
+  language         Languages @relation("posts_language_translation", fields: [language_code], references: [language_code])
   title            String?
   description      String?
   content          String?
   meta_title       String?
   meta_description String?
 
-  post        Post      @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  status_name Languages @relation(fields: [language_code], references: [language_code])
+  post Post @relation("post_translations", fields: [post_id], references: [id], onDelete: Cascade)
 
   @@map("vh_posts_translations")
 }
@@ -131,85 +133,84 @@ model Category {
   order            Int?
   meta_title       String?
   meta_description String?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
-  user_created_id  String
-  user_updated_id  String
 
-  user_updated User @relation("user_updated", fields: [user_updated_id], references: [id])
-  user_created User @relation("user", fields: [user_created_id], references: [id])
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  user_created_id String
+  user_created    User     @relation("user", fields: [user_created_id], references: [id])
+  user_updated_id String
+  user_updated    User     @relation("user_updated", fields: [user_updated_id], references: [id])
 
-  posts        PostCategory[]
-  translations CategoryTranslations[]
+  posts        PostCategory[]         @relation("category")
+  translations CategoryTranslations[] @relation("category_translations")
 
   @@map("vh_categories")
 }
 
 model CategoryTranslations {
-  id               Int     @id @default(autoincrement())
+  id               Int       @id @default(autoincrement())
   category_id      Int
+  category         Category  @relation("category_translations", fields: [category_id], references: [id], onDelete: Cascade)
   language_code    String
+  language         Languages @relation("categories_language_translation", fields: [language_code], references: [language_code])
   name             String?
   description      String?
   meta_title       String?
   meta_description String?
-
-  category    Category  @relation(fields: [category_id], references: [id], onDelete: Cascade)
-  status_name Languages @relation(fields: [language_code], references: [language_code])
 
   @@map("vh_categories_translations")
 }
 
 model PostCategory {
   post_id     Int
+  post        Post     @relation("post", fields: [post_id], references: [id], onDelete: Cascade)
   category_id Int
-
-  post     Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  category    Category @relation("category", fields: [category_id], references: [id], onDelete: Cascade)
 
   @@id([post_id, category_id])
   @@map("vh_post_category")
 }
 
 model Media {
-  id              Int      @id @default(autoincrement())
-  public_id       String
-  filename        String
-  resource_type   String
-  format          String
-  size            Int
-  width           Int
-  height          Int
-  url             String
-  url_cdn         String?
-  title           String?
-  alt             String?
-  description     String?
-  status          Status   @default(publish)
+  id            Int     @id @default(autoincrement())
+  public_id     String
+  filename      String
+  resource_type String
+  format        String
+  size          Int
+  width         Int
+  height        Int
+  url           String
+  url_cdn       String?
+  title         String?
+  alt           String?
+  description   String?
+  status        Status  @default(publish)
+
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
   user_created_id String
+  user_created    User     @relation("user", fields: [user_created_id], references: [id])
   user_updated_id String
+  user_updated    User     @relation("user_updated", fields: [user_updated_id], references: [id])
 
-  user_updated User                @relation("user_updated", fields: [user_updated_id], references: [id])
-  user_created User                @relation("user", fields: [user_created_id], references: [id])
-  translations MediaTranslations[]
+  translations MediaTranslations[] @relation("media_translation")
   posts        Post[]              @relation("post_thumb")
   categories   Category[]          @relation("category_thumb")
+  User         User[]              @relation("avatar")
 
   @@map("vh_media")
 }
 
 model MediaTranslations {
-  id            Int     @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   media_id      Int
+  media         Media     @relation("media_translation", fields: [media_id], references: [id], onDelete: Cascade)
   language_code String
+  language      Languages @relation("media_language_translation", fields: [language_code], references: [language_code])
   title         String?
   alt           String?
   description   String?
-
-  media       Media     @relation(fields: [media_id], references: [id], onDelete: Cascade)
-  status_name Languages @relation(fields: [language_code], references: [language_code])
 
   @@map("vh_media_translations")
 }

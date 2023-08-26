@@ -22,7 +22,7 @@ export class InsertUserDto {
   @IsOptional()
   @IsString()
   @MaxLength(15)
-  username?: string;
+  username: string;
 
   @IsOptional()
   @IsString()
@@ -35,18 +35,16 @@ export class InsertUserDto {
   @IsOptional()
   role: Role;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @MaxLength(255)
   first_name: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @MaxLength(255)
   last_name: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  avatar: string;
+  avatar_id?: number | null;
 }

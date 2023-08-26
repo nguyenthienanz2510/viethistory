@@ -29,18 +29,20 @@ export class AuthService {
 
     try {
       const hashedPassword = await argon.hash(userDto.password);
+
       const user = await this.prismaService.user.create({
         data: {
           ...userDto,
           username: userDto.username || userDto.email,
-          password: hashedPassword,
-          role: userDto.role || 'subscriber',
-          status: userDto.status || 'active',
+          password: hashedPassword
         },
+        include: {
+          avatar: true
+        }
       });
 
-      delete user.password;
-      delete user.refresh_token;
+      delete user.password
+      delete user.refresh_token
 
       const tokens = await this.getTokens(user.id, user.email);
       await this.updateRefreshToken(user.id, tokens.refresh_token);
@@ -51,6 +53,7 @@ export class AuthService {
         { tokens, profile: user },
       );
     } catch (error) {
+      console.error(error);
       if (error.code === 'P2002') {
         throw new ForbiddenException(
           `Unique constraint failed on the ${error.meta.target}`,

@@ -10,14 +10,58 @@ export class PostService {
     private readonly baseService: BaseService,
   ) {}
 
+  selectReturnField = {
+    id: true,
+    title: true,
+    slug: true,
+    description: true,
+    status: true,
+    thumb: true,
+    images: true,
+    content: true,
+    timestamp: true,
+    is_featured: true,
+    order: true,
+    meta_title: true,
+    meta_description: true,
+    created_at: true,
+    updated_at: true,
+    user_created: {
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        phone_number: true,
+        role: true,
+        status: true,
+        first_name: true,
+        last_name: true,
+        avatar_id: true,
+        created_at: true,
+        updated_at: true,
+      },
+    },
+    user_updated: {
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        phone_number: true,
+        role: true,
+        status: true,
+        first_name: true,
+        last_name: true,
+        avatar_id: true,
+        created_at: true,
+        updated_at: true,
+      },
+    },
+    translations: true,
+  };
+
   async getPosts() {
     const posts = await this.prismaService.post.findMany({
-      include: {
-        user_created: true,
-        user_updated: true,
-        translations: true,
-        thumb: true,
-      },
+      select: this.selectReturnField,
     });
 
     const formattedPosts = posts.map((post) => {
@@ -50,12 +94,7 @@ export class PostService {
         where: {
           slug: slug,
         },
-        include: {
-          user_created: true,
-          user_updated: true,
-          translations: true,
-          thumb: true,
-        },
+        select: this.selectReturnField,
       });
 
       const translations = {};
@@ -86,12 +125,7 @@ export class PostService {
 
     const post = await this.prismaService.post.findUnique({
       where: { id: postId },
-      include: {
-        user_created: true,
-        user_updated: true,
-        translations: true,
-        thumb: true,
-      },
+      select: this.selectReturnField,
     });
 
     const translations = {};
@@ -260,16 +294,7 @@ export class PostService {
           updateMany: translationUpdates,
         },
       },
-      include: {
-        user_created: true,
-        user_updated: true,
-        translations: true,
-        categories: {
-          include: {
-            category: true,
-          },
-        },
-      },
+      select: this.selectReturnField,
     });
 
     return this.baseService.generateSuccessResponse(
@@ -283,9 +308,7 @@ export class PostService {
     await this.checkPostExist(postId);
     const post = await this.prismaService.post.delete({
       where: { id: postId },
-      include: {
-        translations: true,
-      },
+      select: this.selectReturnField,
     });
     return this.baseService.generateSuccessResponse(
       HttpStatus.OK,

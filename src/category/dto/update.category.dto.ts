@@ -1,6 +1,8 @@
 import { Status } from '@prisma/client';
+import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -24,7 +26,7 @@ export class UpdateCategoryDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(255)
+  @MaxLength(500)
   description?: string;
 
   @IsOptional()
@@ -61,4 +63,34 @@ export class UpdateCategoryDto {
   user_created_id?: string;
 
   user_updated_id: string;
+
+  @IsArray()
+  @Type(() => CategoryTranslations)
+  translations: CategoryTranslations[];
+}
+
+class CategoryTranslations {
+  @IsNotEmpty()
+  @IsString()
+  language_code: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  meta_title?;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  meta_description?;
 }

@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AccessJwtGuard } from '../auth/guard';
@@ -18,7 +19,13 @@ import { InsertCategoryDto, UpdateCategoryDto } from './dto';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
   @Get()
-  getCategories() {
+  getCategories(@Query('slug') slug: string) {
+    const query = {
+      slug: slug,
+    };
+    if (query.slug) {
+      return this.categoryService.getCategoryBySlug(query);
+    }
     return this.categoryService.getCategories();
   }
 
